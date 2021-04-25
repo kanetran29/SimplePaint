@@ -22,14 +22,25 @@ namespace Paint
     /// </summary>
     public partial class MainWindow : Window
     {
+        public enum Tool 
+        {
+            Brush,
+            Eraser,
+            Shape
+        }
 
         Point iniP;
         Stroke _pre_stroke;
         private MainViewModel MainVM;
+        private SolidColorBrush CForeground;
+        private SolidColorBrush CBackground;
+
+        private Tool CurrentTool; 
         public MainWindow()
         {
             InitializeComponent();
-            icv_Paint.AddHandler(InkCanvas.MouseDownEvent, new MouseButtonEventHandler(icv_Paint_MouseDown), true);
+            icv_Paint.AddHandler(InkCanvas.MouseLeftButtonDownEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonDown), true);
+            icv_Paint.AddHandler(InkCanvas.MouseLeftButtonUpEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonUp), true);
             icv_Paint.Strokes.StrokesChanged += Strokes_StrokesChanged;
 
             icv_Paint.UseCustomCursor = true;
@@ -37,6 +48,9 @@ namespace Paint
 
             //get Data context
             MainVM = PaintWindow.DataContext as MainViewModel;
+            CurrentTool = Tool.Brush;
+            CBackground = new SolidColorBrush(Colors.White);
+            CForeground = new SolidColorBrush(Colors.Black);
         }
 
         private void cbx_Sizes_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -48,14 +62,23 @@ namespace Paint
         {
             // icv_Paint.Cursor = new Cursor(new System.IO.MemoryStream(Paint.Properties.Resources.Cursor1));
             icv_Paint.Cursor = Cursors.No;
-            icv_Paint.DefaultDrawingAttributes.Color = ((SolidColorBrush)icv_Paint.Background).Color;
+            icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
+            CurrentTool = Tool.Eraser;
         }
 
         private void btn_Brush_Click(object sender, RoutedEventArgs e)
         {
             icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Brush;
         }
-        private void Strokes_StrokesChanged(object sender, System.Windows.Ink.StrokeCollectionChangedEventArgs e)
+        private void btn_Shape_Click(object sender, RoutedEventArgs e)
+        {
+            icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Shape;
+        }
+        private void Strokes_StrokesChanged(object sender, StrokeCollectionChangedEventArgs e)
         {
             if (e.Added.Count() != 0)
                 MainVM.StrokesChanged(e.Added);
@@ -65,7 +88,7 @@ namespace Paint
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 // Draw square
-                if (btn_Shape.IsChecked == true)
+                if (CurrentTool == Tool.Shape)
                 {
                     Point endP = e.GetPosition(icv_Paint);
                     List<Point> pointList = new List<Point>
@@ -84,8 +107,9 @@ namespace Paint
                     if(_pre_stroke != null)
                     {
                         icv_Paint.Strokes.Remove(_pre_stroke);
-
+                        MainVM.Undo.RemoveFirst();
                     }
+
                     icv_Paint.Strokes.Add(stroke);
                     _pre_stroke = stroke;
                 }                
@@ -93,12 +117,38 @@ namespace Paint
 
         }
 
-        private void icv_Paint_MouseDown(object sender, MouseButtonEventArgs e)
+        private void icv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if ((bool)btn_Shape.IsChecked)
+            if (CurrentTool == Tool.Shape)
             {
                 iniP = e.GetPosition(icv_Paint);
+                icv_Paint.EditingMode = InkCanvasEditingMode.None;
             }
         }
+        private void icv_Paint_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (CurrentTool == Tool.Shape)
+            {
+                _pre_stroke = null;
+                icv_Paint.EditingMode = InkCanvasEditingMode.Ink;
+            }
+        }
+        private void clp_Foreground_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            CForeground = new SolidColorBrush((Color)clp_Foreground.SelectedColor);
+            if(icv_Paint != null)
+                if(CurrentTool == Tool.Shape || CurrentTool == Tool.Brush)
+                    icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+        }
+
+        private void clp_Background_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            CBackground = new SolidColorBrush((Color)clp_Background.SelectedColor);
+            if (icv_Paint != null)
+                if (CurrentTool == Tool.Eraser)
+                    icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
+        }
+
+
     }
 }

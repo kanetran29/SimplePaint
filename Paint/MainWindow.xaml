@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Paint"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Name="PaintWindow"
@@ -29,21 +30,52 @@
             <Button 
                     x:Name="btn_Eraser"
                     Content="Eraser" Click="btn_Eraser_Click"/>
-            <ToggleButton 
+            <Button 
                     x:Name="btn_Shape"
-                    Content="Shape"/>
+                    Content="Shape" Click="btn_Shape_Click"/>
             <Button 
                     x:Name="btn_Brush"
                     Content="Brush" Click="btn_Brush_Click"/>
-            <Grid>
-                <ComboBox Name="cbx_Sizes"
+            <ComboBox Name="cbx_Sizes"
                           VerticalContentAlignment="Center" 
                           SelectionChanged="cbx_Sizes_SelectionChanged">
-                    <ComboBoxItem Name="cbi_Small" Content="Small"/>
-                    <ComboBoxItem Name="cbi_Medium" Content="Medium"/>
-                    <ComboBoxItem Name="cbi_Large" Content="Large"/>
-                </ComboBox>
+                <ComboBoxItem Name="cbi_Small" Content="Small"/>
+                <ComboBoxItem Name="cbi_Medium" Content="Medium"/>
+                <ComboBoxItem Name="cbi_Large" Content="Large"/>
+            </ComboBox>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Content="Foreground" />
+                <Label Grid.Row="1" Content="Background" />
+                <xctk:ColorPicker
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    x:Name="clp_Foreground"
+                    Width="50" 
+                    SelectedColor="Black"
+                    SelectedColorChanged="clp_Foreground_SelectedColorChanged"/>
+                <xctk:ColorPicker 
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    x:Name="clp_Background"
+                    Width="50"
+                    SelectedColor="White"
+                    SelectedColorChanged="clp_Background_SelectedColorChanged"
+                    />
             </Grid>
+            <Button 
+                    x:Name="btn_Picture"
+                    Content="Picture"/>
+            <Button 
+                    x:Name="btn_Selection"
+                    Content="Selection"/>
         </StackPanel>
         <InkCanvas
             x:Name="icv_Paint"

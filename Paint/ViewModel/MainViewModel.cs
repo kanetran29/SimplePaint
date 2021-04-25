@@ -6,18 +6,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Ink;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Paint
 {
     class MainViewModel:BaseViewModel
     {
-        enum Sections
+        public enum Sections
         {
             Painting,
             Undoing,
             Redoing,
         }
         //Properties
+
         private LinkedList<StrokeCollection> _Undo;
         public LinkedList<StrokeCollection> Undo {
             get => _Undo;
@@ -50,6 +52,11 @@ namespace Paint
         }
 
         private Sections _section;
+        public Sections section
+        {
+            get => _section;
+            set => _section = value;
+        }
 
         //Command
         public ICommand UndoCommand { get; set; }
@@ -59,8 +66,7 @@ namespace Paint
             Undo = new LinkedList<StrokeCollection>();
             Redo = new LinkedList<StrokeCollection>();
             InkStrokes = new StrokeCollection();
-            _section = Sections.Painting;
-
+            section = Sections.Painting;
             //Undo command Implementation
             UndoCommand = new RelayCommand<object>((p) =>
             {
@@ -69,6 +75,7 @@ namespace Paint
                 return true;
             }, (p) =>
             {
+                Debug.WriteLine(Undo.Count());
                 StrokeCollection _undo = Undo.First();
                 _section = Sections.Undoing;
                 InkStrokes.Remove(_undo);
@@ -85,7 +92,7 @@ namespace Paint
             }, (p) =>
             {
                 StrokeCollection _redo = Redo.First();
-                _section = Sections.Redoing;
+                section = Sections.Redoing;
                 InkStrokes.Add(_redo);
                 Redo.RemoveFirst();
                 Undo.AddFirst(_redo);
@@ -94,9 +101,9 @@ namespace Paint
 
         public void StrokesChanged(StrokeCollection strokes)
         {
-            if(_section != Sections.Painting)
+            if(section == Sections.Undoing || section == Sections.Redoing)
             {
-                _section = Sections.Painting;
+                section = Sections.Painting;
                 return;
             }
             Undo.AddFirst(strokes);
