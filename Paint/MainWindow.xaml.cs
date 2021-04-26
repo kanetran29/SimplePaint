@@ -29,13 +29,29 @@ namespace Paint
             Shape
         }
 
+        public enum Shape
+        {
+            Retangle,
+            Triangle,
+            Circle,
+            Diamond,
+        }
+
+        public enum Size
+        {
+            Large,
+            Medium,
+            Small,
+        }
+
         Point iniP;
         Stroke _pre_stroke;
         private MainViewModel MainVM;
         private SolidColorBrush CForeground;
         private SolidColorBrush CBackground;
 
-        private Tool CurrentTool; 
+        private Tool CurrentTool;
+        private Size CurrentSize;
         public MainWindow()
         {
             InitializeComponent();
@@ -44,19 +60,13 @@ namespace Paint
             icv_Paint.Strokes.StrokesChanged += Strokes_StrokesChanged;
 
             icv_Paint.UseCustomCursor = true;
-            cbx_Sizes.SelectedIndex = 0;
+            cbx_Size.SelectedIndex = 0;
 
             //get Data context
             MainVM = PaintWindow.DataContext as MainViewModel;
             CurrentTool = Tool.Brush;
             CBackground = new SolidColorBrush(Colors.White);
             CForeground = new SolidColorBrush(Colors.Black);
-        }
-
-        private void cbx_Sizes_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            int iSize = (cbx_Sizes.SelectedIndex * 4) + 2;
-            icv_Paint.DefaultDrawingAttributes.Width = icv_Paint.DefaultDrawingAttributes.Height = iSize;
         }
         private void btn_Eraser_Click(object sender, RoutedEventArgs e)
         {
@@ -72,11 +82,29 @@ namespace Paint
             icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
             CurrentTool = Tool.Brush;
         }
-        private void btn_Shape_Click(object sender, RoutedEventArgs e)
+        private void cbx_Size_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
-            CurrentTool = Tool.Shape;
+            Debug.WriteLine(cbx_Size.SelectedIndex);
+            switch(cbx_Size.SelectedIndex)
+            {
+                case 0: 
+                    CurrentSize = Size.Small;
+                    icv_Paint.DefaultDrawingAttributes.Width = 2;
+                    icv_Paint.DefaultDrawingAttributes.Height = 2;
+                    break;
+                case 1:
+                    CurrentSize = Size.Medium;
+                    icv_Paint.DefaultDrawingAttributes.Width = 5;
+                    icv_Paint.DefaultDrawingAttributes.Height = 5;
+                    break;
+                case 2:
+                    CurrentSize = Size.Large;
+                    icv_Paint.DefaultDrawingAttributes.Width = 8;
+                    icv_Paint.DefaultDrawingAttributes.Height = 8;
+                    break;
+                default: break;
+            }
+                
         }
         private void Strokes_StrokesChanged(object sender, StrokeCollectionChangedEventArgs e)
         {
@@ -109,7 +137,6 @@ namespace Paint
                         icv_Paint.Strokes.Remove(_pre_stroke);
                         MainVM.Undo.RemoveFirst();
                     }
-
                     icv_Paint.Strokes.Add(stroke);
                     _pre_stroke = stroke;
                 }                
@@ -148,7 +175,6 @@ namespace Paint
                 if (CurrentTool == Tool.Eraser)
                     icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
         }
-
 
     }
 }

@@ -113,6 +113,20 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\eraser.png" />
+    <Resource Include="Resources\paint.png" />
+    <Resource Include="Resources\picture.png" />
+    <Resource Include="Resources\redo.png" />
+    <Resource Include="Resources\select.png" />
+    <Resource Include="Resources\size.png" />
+    <Resource Include="Resources\undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\circle.png" />
+    <Resource Include="Resources\diamond.png" />
+    <Resource Include="Resources\rectangle.png" />
+    <Resource Include="Resources\triangle.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

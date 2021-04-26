@@ -10,78 +10,176 @@
         Name="PaintWindow"
         DataContext="{StaticResource MainVM}"
         Title="Simple Paint" Height="600" Width="800">
-    <DockPanel 
+    <DockPanel        
+        Background="LightGray"
         x:Name="dpn_Main"
         LastChildFill="True">
-        <StackPanel
+        <Border 
+            Height="40"             
+            Margin="5,5,5,0"
             DockPanel.Dock="Top"
-            Name="spn_Tools" 
-            Orientation="Horizontal"
-            Background="LightGray"
-            Height="50">
-            <Button 
-                x:Name="btn_Undo"
-                Command="{Binding UndoCommand}"
-                Content="Undo"/>
-            <Button 
-                x:Name="btn_Redo"
-                Command="{Binding RedoCommand}"
-                Content="Redo"/>
-            <Button 
+            BorderThickness="0"          
+            HorizontalAlignment="Left">
+            <Border.Effect>
+                <DropShadowEffect Color="LightGray"/>
+            </Border.Effect>
+            <StackPanel
+                Name="spn_Tools" 
+                Orientation="Horizontal"
+                Background="LightGray"
+                Height="34">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Setter Property="Margin" Value="1,1,0,0"/>
+                        <Setter Property="Background" Value="{x:Null}"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button 
+                    x:Name="btn_Undo"
+                    Width="32"
+                    Command="{Binding UndoCommand}"
+                    ToolTip="Undo">
+                    <Image Source="/Resources/undo.png" Width="24" Height="24"/>
+                </Button>
+                <Button 
+                    Width="32"
+                    x:Name="btn_Redo"
+                    Command="{Binding RedoCommand}"
+                    ToolTip="Redo">
+                    <Image Source="/Resources/redo.png" Width="24" Height="24"/>
+                </Button>
+                <Button 
                     x:Name="btn_Eraser"
-                    Content="Eraser" Click="btn_Eraser_Click"/>
-            <Button 
-                    x:Name="btn_Shape"
-                    Content="Shape" Click="btn_Shape_Click"/>
-            <Button 
-                    x:Name="btn_Brush"
-                    Content="Brush" Click="btn_Brush_Click"/>
-            <ComboBox Name="cbx_Sizes"
-                          VerticalContentAlignment="Center" 
-                          SelectionChanged="cbx_Sizes_SelectionChanged">
-                <ComboBoxItem Name="cbi_Small" Content="Small"/>
-                <ComboBoxItem Name="cbi_Medium" Content="Medium"/>
-                <ComboBoxItem Name="cbi_Large" Content="Large"/>
-            </ComboBox>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Content="Foreground" />
-                <Label Grid.Row="1" Content="Background" />
-                <xctk:ColorPicker
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    x:Name="clp_Foreground"
-                    Width="50" 
-                    SelectedColor="Black"
-                    SelectedColorChanged="clp_Foreground_SelectedColorChanged"/>
-                <xctk:ColorPicker 
-                    Grid.Row="1"
-                    Grid.Column="1"
+                    Width="32"
+                    ToolTip="Eraser" Click="btn_Eraser_Click">
+                    <Image Source="/Resources/eraser.png" Width="24" Height="24"/>
+                </Button>
+                <Border BorderBrush="DimGray" BorderThickness="1" Margin="1,1,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button
+                            BorderThickness="0"
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            x:Name="btn_Rectangle"
+                            Width="16"
+                            Height="15"
+                            Padding="2" 
+                            ToolTip="Rectangle">
+                            <Image Source="Resources/rectangle.png"/>
+                        </Button>
+                        <Button 
+                            BorderThickness="0"
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            x:Name="btn_Triangle"
+                            Width="16"
+                            Height="15"
+                            Padding="2" 
+                            ToolTip="Triangle">
+                            <Image Source="Resources/triangle.png"/>
+                        </Button>
+                        <Button 
+                            BorderThickness="0"
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            x:Name="btn_Circle"
+                            Width="16"
+                            Height="15"
+                            Padding="2"
+                            ToolTip="Circle">
+                            <Image Source="Resources/circle.png"/>
+                        </Button>
+                        <Button
+                            BorderThickness="0"
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            x:Name="btn_Diamond"
+                            Width="16"
+                            Height="15"
+                            Padding="2" 
+                            ToolTip="Diamond">
+                            <Image Source="Resources/diamond.png"/>
+                        </Button>
+                    </Grid>
+                </Border>
+                <Button 
+                x:Name="btn_Brush"
+                Width="32"
+                ToolTip="Brush" Click="btn_Brush_Click">
+                    <Image Source="Resources/paint.png"/>
+                </Button>
+                <ComboBox 
+                x:Name="cbx_Size"
+                BorderBrush="DimGray"
+                Margin="1,1,0,0"
+                Width="50"
+                Padding="4,10,0,0"
+                VerticalContentAlignment="Center"
+                ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
+                    <ComboBoxItem Width="48">
+                        <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                    </ComboBoxItem>
+                    <ComboBoxItem Width="48">
+                        <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                    </ComboBoxItem>
+                    <ComboBoxItem Width="48">
+                        <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                    </ComboBoxItem>
+                </ComboBox>
+                <Border 
+                    BorderBrush="DimGray" 
+                    ToolTip="Color"
+                    BorderThickness="1" 
+                    Margin="1,1,0,0">
+                    <Grid Width="40" Margin="1">
+                        <xctk:ColorPicker
                     x:Name="clp_Background"
-                    Width="50"
-                    SelectedColor="White"
-                    SelectedColorChanged="clp_Background_SelectedColorChanged"
-                    />
-            </Grid>
-            <Button 
-                    x:Name="btn_Picture"
-                    Content="Picture"/>
-            <Button 
-                    x:Name="btn_Selection"
-                    Content="Selection"/>
-        </StackPanel>
+                    ToolTip="Background"
+                    Width="24" Height="24"
+                    SelectedColor="White"                    
+                    SelectedColorChanged="clp_Background_SelectedColorChanged" 
+                    Background="{x:Null}"
+                    BorderThickness="0"
+                    ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
+                        <xctk:ColorPicker
+                    x:Name="clp_Foreground"
+                    ToolTip="Foreground"
+                    Width="24" Height="24"
+                    SelectedColor="Black"
+                    SelectedColorChanged="clp_Foreground_SelectedColorChanged" 
+                    Background="{x:Null}"
+                    BorderThickness="0"
+                    ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
+                    </Grid>
+                </Border>
+                <Button 
+                Width="32"
+                x:Name="btn_Picture"
+                ToolTip="Picture">
+                    <Image Source="Resources/picture.png"/>
+                </Button>
+                <Button 
+                x:Name="btn_Selection"
+                Width="32"
+                ToolTip="Selection">
+                    <Image Source="Resources/select.png"/>
+                </Button>
+            </StackPanel>
+        </Border>
         <InkCanvas
             x:Name="icv_Paint"
             MouseMove="icv_Paint_MouseMove"
             Strokes="{Binding InkStrokes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Margin="0">
+            Margin="5">
         </InkCanvas>
     </DockPanel>
 </Window>
