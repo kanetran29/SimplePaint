@@ -73,7 +73,8 @@
                             Width="16"
                             Height="15"
                             Padding="2" 
-                            ToolTip="Rectangle">
+                            ToolTip="Rectangle" 
+                            Click="btn_Rectangle_Click">
                             <Image Source="Resources/rectangle.png"/>
                         </Button>
                         <Button 
@@ -84,7 +85,8 @@
                             Width="16"
                             Height="15"
                             Padding="2" 
-                            ToolTip="Triangle">
+                            ToolTip="Triangle"
+                            Click="btn_Triangle_Click">
                             <Image Source="Resources/triangle.png"/>
                         </Button>
                         <Button 
@@ -95,7 +97,8 @@
                             Width="16"
                             Height="15"
                             Padding="2"
-                            ToolTip="Circle">
+                            ToolTip="Circle"
+                            Click="btn_Circle_Click">
                             <Image Source="Resources/circle.png"/>
                         </Button>
                         <Button
@@ -106,71 +109,84 @@
                             Width="16"
                             Height="15"
                             Padding="2" 
-                            ToolTip="Diamond">
+                            ToolTip="Diamond"
+                            Click="btn_Diamond_Click">
                             <Image Source="Resources/diamond.png"/>
                         </Button>
                     </Grid>
                 </Border>
                 <Button 
-                x:Name="btn_Brush"
-                Width="32"
-                ToolTip="Brush" Click="btn_Brush_Click">
+                    x:Name="btn_Brush"
+                    Width="32"
+                    ToolTip="Brush" Click="btn_Brush_Click">
                     <Image Source="Resources/paint.png"/>
                 </Button>
-                <ComboBox 
-                x:Name="cbx_Size"
-                BorderBrush="DimGray"
-                Margin="1,1,0,0"
-                Width="50"
-                Padding="4,10,0,0"
-                VerticalContentAlignment="Center"
-                ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
-                    <ComboBoxItem Width="48">
-                        <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                    </ComboBoxItem>
-                    <ComboBoxItem Width="48">
-                        <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                    </ComboBoxItem>
-                    <ComboBoxItem Width="48">
-                        <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                    </ComboBoxItem>
-                </ComboBox>
                 <Border 
                     BorderBrush="DimGray" 
-                    ToolTip="Color"
                     BorderThickness="1" 
                     Margin="1,1,0,0">
+                    <ComboBox 
+                        x:Name="cbx_Size"
+                        BorderThickness="0"
+                        Margin="1,1,0,0"
+                        Width="50"
+                        Padding="4,10,0,0"
+                        VerticalContentAlignment="Center"
+                        ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
+                        <ComboBoxItem Width="48">
+                            <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem Width="48">
+                            <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem Width="48">
+                            <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                        </ComboBoxItem>
+                    </ComboBox>
+                </Border>
+
+                <Border 
+                        BorderBrush="DimGray" 
+                        ToolTip="Color"
+                        BorderThickness="1" 
+                        Margin="1,1,0,0">
                     <Grid Width="40" Margin="1">
                         <xctk:ColorPicker
-                    x:Name="clp_Background"
-                    ToolTip="Background"
-                    Width="24" Height="24"
-                    SelectedColor="White"                    
-                    SelectedColorChanged="clp_Background_SelectedColorChanged" 
-                    Background="{x:Null}"
-                    BorderThickness="0"
-                    ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
+                            x:Name="clp_Background"
+                            ToolTip="Background"
+                            Width="24" Height="24"
+                            SelectedColor="White"                    
+                            SelectedColorChanged="clp_Background_SelectedColorChanged" 
+                            Background="{x:Null}"
+                            BorderThickness="0"
+                            ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
                         <xctk:ColorPicker
-                    x:Name="clp_Foreground"
-                    ToolTip="Foreground"
-                    Width="24" Height="24"
-                    SelectedColor="Black"
-                    SelectedColorChanged="clp_Foreground_SelectedColorChanged" 
-                    Background="{x:Null}"
-                    BorderThickness="0"
-                    ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
+                            x:Name="clp_Foreground"
+                            ToolTip="Foreground"
+                            Width="24" Height="24"
+                            SelectedColor="Black"
+                            SelectedColorChanged="clp_Foreground_SelectedColorChanged" 
+                            Background="{x:Null}"
+                            BorderThickness="0"
+                            ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
                     </Grid>
                 </Border>
                 <Button 
-                Width="32"
-                x:Name="btn_Picture"
-                ToolTip="Picture">
+                        Width="32"
+                        x:Name="btn_Picture"
+                        ToolTip="Picture">
                     <Image Source="Resources/picture.png"/>
                 </Button>
                 <Button 
-                x:Name="btn_Selection"
-                Width="32"
-                ToolTip="Selection">
+                    x:Name="btn_Text"
+                    Width="32"
+                    ToolTip="Text">
+                    <Image Source="Resources/text.png"/>
+                </Button>
+                <Button 
+                    x:Name="btn_Selection"
+                    Width="32"
+                    ToolTip="Selection">
                     <Image Source="Resources/select.png"/>
                 </Button>
             </StackPanel>

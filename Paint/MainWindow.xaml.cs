@@ -26,32 +26,19 @@ namespace Paint
         {
             Brush,
             Eraser,
-            Shape
-        }
-
-        public enum Shape
-        {
             Retangle,
             Triangle,
             Circle,
             Diamond,
         }
 
-        public enum Size
-        {
-            Large,
-            Medium,
-            Small,
-        }
-
-        Point iniP;
+        Point beginP;
         Stroke _pre_stroke;
         private MainViewModel MainVM;
         private SolidColorBrush CForeground;
         private SolidColorBrush CBackground;
 
         private Tool CurrentTool;
-        private Size CurrentSize;
         public MainWindow()
         {
             InitializeComponent();
@@ -82,27 +69,60 @@ namespace Paint
             icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
             CurrentTool = Tool.Brush;
         }
+        private void btn_Rectangle_Click(object sender, RoutedEventArgs e)
+        {
+            icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Retangle;
+        }
+        private void btn_Circle_Click(object sender, RoutedEventArgs e)
+        {
+            icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Circle;
+        }
+        private void btn_Triangle_Click(object sender, RoutedEventArgs e)
+        {
+            icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Triangle;
+        }
+        private void btn_Diamond_Click(object sender, RoutedEventArgs e)
+        {
+            icv_Paint.Cursor = Cursors.Pen;
+            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            CurrentTool = Tool.Diamond;
+        }
+        private List<Point> GenerateEclipseGeometry(Point st, Point ed)
+        {
+            double a = 0.5 * (ed.X - st.X);
+            double b = 0.5 * (ed.Y - st.Y);
+            List<Point> pointList = new List<Point>();
+            for (double r = 0; r <= 2 * Math.PI; r = r + 0.01)
+            {
+                pointList.Add(new Point(0.5 * (st.X + ed.X) + a * Math.Cos(r), 0.5 * (st.Y + ed.Y) + b * Math.Sin(r)));
+            }
+            return pointList;
+        }
         private void cbx_Size_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Debug.WriteLine(cbx_Size.SelectedIndex);
             switch(cbx_Size.SelectedIndex)
             {
                 case 0: 
-                    CurrentSize = Size.Small;
                     icv_Paint.DefaultDrawingAttributes.Width = 2;
                     icv_Paint.DefaultDrawingAttributes.Height = 2;
                     break;
                 case 1:
-                    CurrentSize = Size.Medium;
                     icv_Paint.DefaultDrawingAttributes.Width = 5;
                     icv_Paint.DefaultDrawingAttributes.Height = 5;
                     break;
                 case 2:
-                    CurrentSize = Size.Large;
                     icv_Paint.DefaultDrawingAttributes.Width = 8;
                     icv_Paint.DefaultDrawingAttributes.Height = 8;
                     break;
-                default: break;
+                default:
+                    break;
             }
                 
         }
@@ -116,16 +136,16 @@ namespace Paint
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 // Draw square
-                if (CurrentTool == Tool.Shape)
+                if (CurrentTool == Tool.Retangle)
                 {
                     Point endP = e.GetPosition(icv_Paint);
                     List<Point> pointList = new List<Point>
                     {
-                        new Point(iniP.X, iniP.Y),
-                        new Point(iniP.X, endP.Y),
+                        new Point(beginP.X, beginP.Y),
+                        new Point(beginP.X, endP.Y),
                         new Point(endP.X, endP.Y),
-                        new Point(endP.X, iniP.Y),
-                        new Point(iniP.X, iniP.Y),
+                        new Point(endP.X, beginP.Y),
+                        new Point(beginP.X, beginP.Y),
                     };
                     StylusPointCollection point = new StylusPointCollection(pointList);
                     Stroke stroke = new Stroke(point)
@@ -139,22 +159,90 @@ namespace Paint
                     }
                     icv_Paint.Strokes.Add(stroke);
                     _pre_stroke = stroke;
-                }                
+                }
+                // Draw Eclipse
+                if (CurrentTool == Tool.Circle)
+                {
+                    Point endP = e.GetPosition(icv_Paint);
+                    List<Point> pointList = GenerateEclipseGeometry(beginP, endP);
+                    StylusPointCollection point = new StylusPointCollection(pointList);
+                    Stroke stroke = new Stroke(point)
+                    {
+                        DrawingAttributes = icv_Paint.DefaultDrawingAttributes.Clone()
+                    };
+                    if (_pre_stroke != null)
+                    {
+                        icv_Paint.Strokes.Remove(_pre_stroke);
+                        MainVM.Undo.RemoveFirst();
+                    }
+                    icv_Paint.Strokes.Add(stroke);
+                    _pre_stroke = stroke;
+                }
+                // Draw triangle
+                if (CurrentTool == Tool.Triangle)
+                {
+                    Point endP = e.GetPosition(icv_Paint);
+                    List<Point> pointList = new List<Point>
+                    {
+                        new Point((beginP.X + endP.X)/2, beginP.Y),
+                        new Point(beginP.X, endP.Y),
+                        new Point(endP.X, endP.Y),
+                        new Point((beginP.X + endP.X)/2, beginP.Y),
+                    };
+                    StylusPointCollection point = new StylusPointCollection(pointList);
+                    Stroke stroke = new Stroke(point)
+                    {
+                        DrawingAttributes = icv_Paint.DefaultDrawingAttributes.Clone()
+                    };
+                    if (_pre_stroke != null)
+                    {
+                        icv_Paint.Strokes.Remove(_pre_stroke);
+                        MainVM.Undo.RemoveFirst();
+                    }
+                    icv_Paint.Strokes.Add(stroke);
+                    _pre_stroke = stroke;
+                }
+                // Draw diamond
+                if (CurrentTool == Tool.Diamond)
+                {
+                    Point endP = e.GetPosition(icv_Paint);
+                    List<Point> pointList = new List<Point>
+                    {
+                        new Point((beginP.X + endP.X)/2, beginP.Y),
+                        new Point(endP.X, beginP.Y + (endP.Y - beginP.Y)/3),
+                        new Point(beginP.X + (endP.X - beginP.X)*0.75, endP.Y),
+                        new Point(beginP.X + (endP.X - beginP.X)*0.25, endP.Y),
+                        new Point(beginP.X, beginP.Y + (endP.Y - beginP.Y)/3),
+                        new Point((beginP.X + endP.X)/2, beginP.Y),
+                    };
+                    StylusPointCollection point = new StylusPointCollection(pointList);
+                    Stroke stroke = new Stroke(point)
+                    {
+                        DrawingAttributes = icv_Paint.DefaultDrawingAttributes.Clone()
+                    };
+                    if (_pre_stroke != null)
+                    {
+                        icv_Paint.Strokes.Remove(_pre_stroke);
+                        MainVM.Undo.RemoveFirst();
+                    }
+                    icv_Paint.Strokes.Add(stroke);
+                    _pre_stroke = stroke;
+                }
+
             }
 
         }
-
         private void icv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (CurrentTool == Tool.Shape)
+            if (CurrentTool == Tool.Retangle || CurrentTool == Tool.Triangle || CurrentTool == Tool.Circle || CurrentTool == Tool.Diamond)
             {
-                iniP = e.GetPosition(icv_Paint);
+                beginP = e.GetPosition(icv_Paint);
                 icv_Paint.EditingMode = InkCanvasEditingMode.None;
             }
         }
         private void icv_Paint_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (CurrentTool == Tool.Shape)
+            if (CurrentTool == Tool.Retangle || CurrentTool == Tool.Triangle || CurrentTool == Tool.Circle || CurrentTool == Tool.Diamond)
             {
                 _pre_stroke = null;
                 icv_Paint.EditingMode = InkCanvasEditingMode.Ink;
@@ -164,10 +252,10 @@ namespace Paint
         {
             CForeground = new SolidColorBrush((Color)clp_Foreground.SelectedColor);
             if(icv_Paint != null)
-                if(CurrentTool == Tool.Shape || CurrentTool == Tool.Brush)
+                //if (CurrentTool == Tool.Retangle || CurrentTool == Tool.Triangle || CurrentTool == Tool.Circle || CurrentTool == Tool.Diamond || CurrentTool == Tool.Brush)
+                if (CurrentTool != Tool.Eraser)
                     icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
         }
-
         private void clp_Background_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
             CBackground = new SolidColorBrush((Color)clp_Background.SelectedColor);
@@ -175,6 +263,5 @@ namespace Paint
                 if (CurrentTool == Tool.Eraser)
                     icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
         }
-
     }
 }
