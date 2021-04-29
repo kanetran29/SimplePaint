@@ -50,7 +50,6 @@ namespace Paint
             InitializeComponent();
             icv_Paint.AddHandler(InkCanvas.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonDown), true);
             icv_Paint.AddHandler(InkCanvas.PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonUp), true);
-            icv_Paint.Strokes.StrokesChanged += Strokes_StrokesChanged;
 
             icv_Paint.UseCustomCursor = true;
             cbx_Size.SelectedIndex = 0;
@@ -92,9 +91,6 @@ namespace Paint
             CBackground = new SolidColorBrush(Colors.White);
             CForeground = new SolidColorBrush(Colors.Black);
         }
-        private void PaintWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
         #region Handler for tools
         private void btn_Eraser_Click(object sender, RoutedEventArgs e)
         {
@@ -102,14 +98,14 @@ namespace Paint
             icv_Paint.Cursor = Cursors.No;
             icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
             CurrentTool = Tool.Eraser;
-            icv_Paint.EditingMode = InkCanvasEditingMode.Ink;
+            icv_Paint.EditingMode = InkCanvasEditingMode.None;
         }
         private void btn_Brush_Click(object sender, RoutedEventArgs e)
         {
             icv_Paint.Cursor = Cursors.Pen;
             icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
             CurrentTool = Tool.Brush;
-            icv_Paint.EditingMode = InkCanvasEditingMode.Ink;
+            icv_Paint.EditingMode = InkCanvasEditingMode.None;
         }
         private void btn_Line_Click(object sender, RoutedEventArgs e)
         {
@@ -263,22 +259,40 @@ namespace Paint
         }
         #endregion
         #region handler for drawing
-        private void Strokes_StrokesChanged(object sender, StrokeCollectionChangedEventArgs e)
-        {
-            // if (e.Added.Count() != 0)
-            // MainVM.StrokesChanged(e.Added);
-        }
         private void icv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             switch (CurrentTool)
             {
+                case Tool.Brush:
+                case Tool.Eraser:
+                    startP = e.GetPosition(icv_Paint);
+                    icv_Paint.EditingMode = InkCanvasEditingMode.None;
+                    if (shape == null)
+                    {
+                        double StrokeThickness = icv_Paint.DefaultDrawingAttributes.Width;
+                        //get color for fill and outline
+                        SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? CForeground : new SolidColorBrush(Colors.Transparent);
+                        SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? CBackground : new SolidColorBrush(Colors.Transparent);
+                        shape = new Ellipse()
+                        {
+                            Stroke = (CurrentTool == Tool.Brush) ? foreground : background,
+                            Fill = (CurrentTool == Tool.Brush) ? foreground : background,
+                            Width = StrokeThickness,
+                            Height = StrokeThickness,
+                            StrokeThickness = StrokeThickness,
+                            Margin = new Thickness(startP.X, startP.Y, 0, 0)
+                        };
+                        icv_Paint.Children.Add(shape);                     
+                    }
+                    break;
+
                 case Tool.Retangle:
                 case Tool.Triangle:
                 case Tool.Ellipse:
                 case Tool.Pentagon:
                 case Tool.Line:
                 case Tool.Text:
-                case Tool.Image:
+                case Tool.Image:           
                     startP = e.GetPosition(icv_Paint);
                     icv_Paint.EditingMode = InkCanvasEditingMode.None;
                     shape = null;
@@ -337,6 +351,29 @@ namespace Paint
                 else
                     switch (CurrentTool)
                     {
+                        
+                        case Tool.Brush:
+                        case Tool.Eraser:
+                            if (shape is Ellipse)
+                            {
+                                icv_Paint.Children.Remove(shape);
+                                shape = new Polyline()
+                                {
+                                    Stroke = (CurrentTool == Tool.Brush) ? CForeground : CBackground,
+                                    StrokeThickness = icv_Paint.DefaultDrawingAttributes.Width,
+                                    Points = new PointCollection()
+                                    {
+                                        startP,
+                                        endP,
+                                    }
+                                };
+                                icv_Paint.Children.Add(shape);
+                                break;
+                            }
+                            Polyline bpolyline = shape as Polyline;
+                            bpolyline.Points.Add(endP);
+                            shape = bpolyline;
+                            break;
                         case Tool.Image:
                             Rectangle Ishape = shape as Rectangle;
                             Ishape.Width = (eX - sX);
@@ -407,6 +444,7 @@ namespace Paint
 
             switch (CurrentTool)
             {
+                case Tool.Brush:
                 case Tool.Retangle:
                 case Tool.Triangle:
                 case Tool.Ellipse:
@@ -449,29 +487,7 @@ namespace Paint
                     }
                     break;
                 case Tool.Image:
-                    //OpenFileDialog open = new OpenFileDialog()
-                    //{
-                    //    Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
-                    //};
-                    //if (open.ShowDialog() == true)
-                    //{
-                    //    Debug.WriteLine(open.FileName);
-                    //    Uri fileUri = new Uri(open.FileName);
-                    //    shape.
-                    //    Image img = new Image()
-                    //    {
-                    //        Width = Math.Abs(endP.X - startP.X),
-                    //        Height = Math.Abs(endP.Y - startP.Y),
-                    //        Source = new BitmapImage(fileUri),
-                    //        Stretch = Stretch.Fill,
-                    //        Margin = ((Rectangle)shape).Margin,
-                    //    };
-                    //    icv_Paint.Children.Add(img);
-                    //    icv_Paint.EditingMode = InkCanvasEditingMode.Select;
-                    //    //icv_Paint.Select(img as StrokeCollection);
-                    //};
-                    //if (icv_Paint.Children.Contains(shape))
-                    //    icv_Paint.Children.Remove(shape);
+                    img = null;
                     shape = null;
                     startP.X = startP.Y = 0;
                     endP.X = endP.Y = 0;
@@ -480,8 +496,6 @@ namespace Paint
 
         }
         #endregion
-
-
         //check mouse in
         private void _textbox_MouseLeave(object sender, MouseEventArgs e)
         {

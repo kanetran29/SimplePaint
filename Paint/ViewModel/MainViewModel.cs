@@ -24,8 +24,8 @@ namespace Paint
         DependencyProperty.Register("MyFontFamily",
         typeof(FontFamily), typeof(MainWindow), new UIPropertyMetadata(null));
 
-        private LinkedList<StrokeCollection> _Undo;
-        public LinkedList<StrokeCollection> Undo {
+        private LinkedList<UIElement> _Undo;
+        public LinkedList<UIElement> Undo {
             get => _Undo;
             set
             {
@@ -33,8 +33,8 @@ namespace Paint
                 OnPropertyChanged("Undo");
             }
         }
-        private LinkedList<StrokeCollection> _Redo;
-        public LinkedList<StrokeCollection> Redo
+        private LinkedList<UIElement> _Redo;
+        public LinkedList<UIElement> Redo
         {
             get => _Redo;
             set
@@ -44,8 +44,8 @@ namespace Paint
             }
         }
 
-        private StrokeCollection _InkStrokes;
-        public StrokeCollection InkStrokes
+        private LinkedList<UIElement> _InkStrokes;
+        public LinkedList<UIElement> InkStrokes
         {
             get => _InkStrokes;
             set
@@ -67,9 +67,9 @@ namespace Paint
         public ICommand RedoCommand { get; set; }
         public MainViewModel()
         {
-            Undo = new LinkedList<StrokeCollection>();
-            Redo = new LinkedList<StrokeCollection>();
-            InkStrokes = new StrokeCollection();
+            Undo = new LinkedList<UIElement>();
+            Redo = new LinkedList<UIElement>();
+            InkStrokes = new LinkedList<UIElement>();
             section = Sections.Painting;
             //Undo command Implementation
             UndoCommand = new RelayCommand<object>((p) =>
@@ -80,7 +80,7 @@ namespace Paint
             }, (p) =>
             {
                 Debug.WriteLine(Undo.Count());
-                StrokeCollection _undo = Undo.First();
+                UIElement _undo = Undo.First();
                 _section = Sections.Undoing;
                 InkStrokes.Remove(_undo);
                 Undo.RemoveFirst();
@@ -95,23 +95,12 @@ namespace Paint
                 return true;
             }, (p) =>
             {
-                StrokeCollection _redo = Redo.First();
+                UIElement _redo = Redo.First();
                 section = Sections.Redoing;
-                InkStrokes.Add(_redo);
+                //InkStrokes.Add(_redo);
                 Redo.RemoveFirst();
                 Undo.AddFirst(_redo);
             });
-        }
-
-        public void StrokesChanged(StrokeCollection strokes)
-        {
-            if(section == Sections.Undoing || section == Sections.Redoing)
-            {
-                section = Sections.Painting;
-                return;
-            }
-            Undo.AddFirst(strokes);
-            Redo.Clear();
         }
     }
 }

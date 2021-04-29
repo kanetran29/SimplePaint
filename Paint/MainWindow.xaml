@@ -10,7 +10,6 @@
         Name="PaintWindow"
         DataContext="{StaticResource MainVM}"
         WindowState="Normal"
-        Loaded="PaintWindow_Loaded"
         Title="Simple Paint" Height="600" Width="800">
     <DockPanel        
         Background="LightGray"
