@@ -9,63 +9,67 @@
         WindowStartupLocation="CenterScreen"
         Name="PaintWindow"
         DataContext="{StaticResource MainVM}"
+        WindowState="Normal"
+        Loaded="PaintWindow_Loaded"
         Title="Simple Paint" Height="600" Width="800">
     <DockPanel        
         Background="LightGray"
         x:Name="dpn_Main"
         LastChildFill="True">
-        <Border 
-            Height="40"             
-            Margin="5,5,5,0"
-            DockPanel.Dock="Top"
-            BorderThickness="0"          
-            HorizontalAlignment="Left">
-            <Border.Effect>
-                <DropShadowEffect Color="LightGray"/>
-            </Border.Effect>
-            <StackPanel
-                Name="spn_Tools" 
-                Orientation="Horizontal"
-                Background="LightGray"
-                Height="34">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="BorderThickness" Value="1"/>
-                        <Setter Property="Margin" Value="1,1,0,0"/>
-                        <Setter Property="Background" Value="{x:Null}"/>
-                    </Style>
-                </StackPanel.Resources>
-                <Button 
+        <DockPanel DockPanel.Dock="Top">
+            <Border 
+                DockPanel.Dock="Left"
+                Grid.Column="0"
+                Height="40"             
+                Margin="5,5,5,0"
+                BorderThickness="0"          
+                HorizontalAlignment="Left">
+                <Border.Effect>
+                    <DropShadowEffect Color="LightGray"/>
+                </Border.Effect>
+                <StackPanel
+                    Name="spn_Tools" 
+                    Orientation="Horizontal"
+                    Background="LightGray"
+                    Height="34">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Margin" Value="1,1,0,0"/>
+                            <Setter Property="Background" Value="{x:Null}"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button 
                     x:Name="btn_Undo"
                     Width="32"
                     Command="{Binding UndoCommand}"
                     ToolTip="Undo">
-                    <Image Source="/Resources/undo.png" Width="24" Height="24"/>
-                </Button>
-                <Button 
+                        <Image Source="/Resources/undo.png" Width="24" Height="24"/>
+                    </Button>
+                    <Button 
                     Width="32"
                     x:Name="btn_Redo"
                     Command="{Binding RedoCommand}"
                     ToolTip="Redo">
-                    <Image Source="/Resources/redo.png" Width="24" Height="24"/>
-                </Button>
-                <Button 
+                        <Image Source="/Resources/redo.png" Width="24" Height="24"/>
+                    </Button>
+                    <Button 
                     x:Name="btn_Eraser"
                     Width="32"
                     ToolTip="Eraser" Click="btn_Eraser_Click">
-                    <Image Source="/Resources/eraser.png" Width="24" Height="24"/>
-                </Button>
-                <Border BorderBrush="DimGray" BorderThickness="1" Margin="1,1,0,0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Button
+                        <Image Source="/Resources/eraser.png" Width="24" Height="24"/>
+                    </Button>
+                    <Border BorderBrush="DimGray" BorderThickness="1" Margin="1,1,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button
                             BorderThickness="0"
                             Grid.Column="0"
                             Grid.Row="0"
@@ -75,9 +79,9 @@
                             Padding="2" 
                             ToolTip="Rectangle" 
                             Click="btn_Rectangle_Click">
-                            <Image Source="Resources/rectangle.png"/>
-                        </Button>
-                        <Button 
+                                <Image Source="Resources/rectangle.png"/>
+                            </Button>
+                            <Button 
                             BorderThickness="0"
                             Grid.Column="0"
                             Grid.Row="1"
@@ -87,45 +91,88 @@
                             Padding="2" 
                             ToolTip="Triangle"
                             Click="btn_Triangle_Click">
-                            <Image Source="Resources/triangle.png"/>
-                        </Button>
-                        <Button 
-                            BorderThickness="0"
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            x:Name="btn_Circle"
-                            Width="16"
-                            Height="15"
-                            Padding="2"
-                            ToolTip="Circle"
-                            Click="btn_Circle_Click">
-                            <Image Source="Resources/circle.png"/>
-                        </Button>
-                        <Button
-                            BorderThickness="0"
-                            Grid.Column="1"
-                            Grid.Row="1"
-                            x:Name="btn_Diamond"
-                            Width="16"
-                            Height="15"
-                            Padding="2" 
-                            ToolTip="Diamond"
-                            Click="btn_Diamond_Click">
-                            <Image Source="Resources/diamond.png"/>
-                        </Button>
-                    </Grid>
-                </Border>
-                <Button 
+                                <Image Source="Resources/triangle.png"/>
+                            </Button>
+                            <Button 
+                                BorderThickness="0"
+                                Grid.Column="1"
+                                Grid.Row="0"
+                                x:Name="btn_Ellipse"
+                                Width="16"
+                                Height="15"
+                                Padding="2"
+                                ToolTip="Ellipse"
+                                Click="btn_Ellipse_Click">
+                                <Image Source="Resources/circle.png"/>
+                            </Button>
+                            <Button
+                                BorderThickness="0"
+                                Grid.Column="1"
+                                Grid.Row="1"
+                                x:Name="btn_Pentagon"
+                                Width="16"
+                                Height="15"
+                                Padding="2" 
+                                ToolTip="Pentagon"
+                                Click="btn_Pentagon_Click">
+                                <Image Source="Resources/diamond.png"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    <Button 
+                    x:Name="btn_Line"
+                    Width="32"
+                    ToolTip="Line" Click="btn_Line_Click">
+                        <Image Source="Resources/line.png"/>
+                    </Button>
+                    <Button 
                     x:Name="btn_Brush"
                     Width="32"
                     ToolTip="Brush" Click="btn_Brush_Click">
-                    <Image Source="Resources/paint.png"/>
-                </Button>
-                <Border 
+                        <Image Source="Resources/paint.png"/>
+                    </Button>
+                    <Button 
+                        Width="32"
+                        x:Name="btn_Picture"
+                        ToolTip="Picture">
+                        <Image Source="Resources/picture.png"/>
+                    </Button>
+                    <Button 
+                        x:Name="btn_Text"
+                        Click="btn_Text_Click"
+                        Width="32"
+                        ToolTip="Text">
+                        <Image Source="Resources/text.png"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+            <Border
+                Grid.Column="1"
+                Height="40"             
+                Margin="50,5,5,0"
+                BorderThickness="0"     
+                DockPanel.Dock="Left"
+                HorizontalAlignment="Left">
+                <Border.Effect>
+                    <DropShadowEffect Color="LightGray"/>
+                </Border.Effect>
+                <StackPanel
+                    Name="spn_Properties" 
+                    Orientation="Horizontal"
+                    Background="LightGray"
+                    Height="34">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Margin" Value="1,1,0,0"/>
+                            <Setter Property="Background" Value="{x:Null}"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Border 
                     BorderBrush="DimGray" 
                     BorderThickness="1" 
                     Margin="1,1,0,0">
-                    <ComboBox 
+                        <ComboBox 
                         x:Name="cbx_Size"
                         BorderThickness="0"
                         Margin="1,1,0,0"
@@ -133,25 +180,64 @@
                         Padding="4,10,0,0"
                         VerticalContentAlignment="Center"
                         ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
-                        <ComboBoxItem Width="48">
-                            <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem Width="48">
-                            <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem Width="48">
-                            <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                        </ComboBoxItem>
-                    </ComboBox>
-                </Border>
-
-                <Border 
+                            <ComboBoxItem Width="48">
+                                <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                            </ComboBoxItem>
+                            <ComboBoxItem Width="48">
+                                <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                            </ComboBoxItem>
+                            <ComboBoxItem Width="48">
+                                <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </Border>
+                    <Border 
+                        BorderBrush="DimGray" 
+                        BorderThickness="1" 
+                        Margin="1,1,0,0">
+                        <ComboBox 
+                            x:Name="cbx_Fill"
+                            BorderThickness="0"
+                            Margin="1,1,0,0"
+                            Width="50"
+                            VerticalContentAlignment="Center"
+                            SelectedIndex="0"
+                            ToolTip="Fill Mode">
+                            <ComboBoxItem Width="30" ToolTip="No Fill">
+                                <Image Height="20" Source="Resources/nofill.png" Stretch="Fill" StretchDirection="Both"/>
+                            </ComboBoxItem>
+                            <ComboBoxItem Width="30" ToolTip="Solid Color">
+                                <Image Height="20" Source="Resources/fill.png" Stretch="Fill" StretchDirection="Both"/>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </Border>
+                    <Border 
+                        BorderBrush="DimGray" 
+                        BorderThickness="1" 
+                        Margin="1,1,0,0">
+                        <ComboBox 
+                            x:Name="cbx_Outline"
+                            BorderThickness="0"
+                            Margin="1,1,0,0"
+                            Width="50"
+                            VerticalContentAlignment="Center"
+                            SelectedIndex="0"
+                            ToolTip="Outline">
+                            <ComboBoxItem Width="30" ToolTip="Solid Outline">
+                                <Image Height="20" Source="Resources/outline.png" Stretch="Fill" StretchDirection="Both"/>
+                            </ComboBoxItem>
+                            <ComboBoxItem Width="30" ToolTip="No Outline">
+                                <Image Height="20" Source="Resources/fill.png" Stretch="Fill" StretchDirection="Both"/>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </Border>
+                    <Border 
                         BorderBrush="DimGray" 
                         ToolTip="Color"
                         BorderThickness="1" 
                         Margin="1,1,0,0">
-                    <Grid Width="40" Margin="1">
-                        <xctk:ColorPicker
+                        <Grid Width="40" Margin="1">
+                            <xctk:ColorPicker
                             x:Name="clp_Background"
                             ToolTip="Background"
                             Width="24" Height="24"
@@ -160,7 +246,7 @@
                             Background="{x:Null}"
                             BorderThickness="0"
                             ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
-                        <xctk:ColorPicker
+                            <xctk:ColorPicker
                             x:Name="clp_Foreground"
                             ToolTip="Foreground"
                             Width="24" Height="24"
@@ -169,31 +255,65 @@
                             Background="{x:Null}"
                             BorderThickness="0"
                             ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
-                    </Grid>
-                </Border>
-                <Button 
-                        Width="32"
-                        x:Name="btn_Picture"
-                        ToolTip="Picture">
-                    <Image Source="Resources/picture.png"/>
-                </Button>
-                <Button 
-                    x:Name="btn_Text"
-                    Width="32"
-                    ToolTip="Text">
-                    <Image Source="Resources/text.png"/>
-                </Button>
-                <Button 
-                    x:Name="btn_Selection"
-                    Width="32"
-                    ToolTip="Selection">
-                    <Image Source="Resources/select.png"/>
-                </Button>
-            </StackPanel>
-        </Border>
+                        </Grid>
+                    </Border>
+                    <Border 
+                        BorderBrush="DimGray" 
+                        BorderThickness="1" 
+                        Margin="1,1,0,0">
+                            <ComboBox 
+                                x:Name="cbx_FontFamily"
+                                BorderThickness="0"
+                                Margin="1,1,0,0"
+                                Width="100"
+                                SelectionChanged="cbx_FontFamily_SelectionChanged"
+                                VerticalContentAlignment="Center"
+                                ToolTip="Font Family">
+                            </ComboBox>
+                        </Border>
+                        <Border 
+                            BorderBrush="DimGray" 
+                            BorderThickness="1"
+                            
+                            Margin="1,1,0,0">
+                            <ComboBox 
+                                x:Name="cbx_FontSize"
+                                BorderThickness="0"
+                                Margin="1,1,0,0"
+                                Width="50"
+                                SelectionChanged="cbx_FontSize_SelectionChanged"
+                                VerticalContentAlignment="Center"
+                                ToolTip="Font Size">
+                            </ComboBox>
+                        </Border>
+                        <Button 
+                        x:Name="btn_B"
+                        Width="24"
+                        Margin="1,1,0,0"
+                        Content="B"
+                        FontWeight="Bold"/>
+                        <Button 
+                        x:Name="btn_I"
+                        Width="24"
+                        Content="I"
+                        Margin="1,1,0,0"
+                        FontStyle="Italic"/>
+                    <Button 
+                        x:Name="btn_U"
+                        Margin="1,1,0,0"
+                        Width="24">
+                        <Button.Content>
+                            <TextBlock>
+                                <Underline>U</Underline>
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </DockPanel>
         <InkCanvas
             x:Name="icv_Paint"
-            MouseMove="icv_Paint_MouseMove"
+            PreviewMouseMove="icv_Paint_MouseMove"           
             Strokes="{Binding InkStrokes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             Margin="5">
         </InkCanvas>

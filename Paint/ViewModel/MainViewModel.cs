@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -19,6 +20,9 @@ namespace Paint
             Redoing,
         }
         //Properties
+        public static readonly DependencyProperty MyFontFamilyProperty =
+        DependencyProperty.Register("MyFontFamily",
+        typeof(FontFamily), typeof(MainWindow), new UIPropertyMetadata(null));
 
         private LinkedList<StrokeCollection> _Undo;
         public LinkedList<StrokeCollection> Undo {

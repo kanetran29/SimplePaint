@@ -71,7 +71,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="Model\PaintStrokeCollection.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -130,6 +129,22 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\lasso.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\line.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\outline.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\nofill.png" />
+    <Resource Include="Resources\fill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
