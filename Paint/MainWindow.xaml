@@ -286,28 +286,34 @@
                                 ToolTip="Font Size">
                             </ComboBox>
                         </Border>
-                        <Button 
-                        x:Name="btn_B"
-                        Width="24"
-                        Margin="1,1,0,0"
-                        Content="B"
-                        FontWeight="Bold"/>
-                        <Button 
-                        x:Name="btn_I"
-                        Width="24"
-                        Content="I"
-                        Margin="1,1,0,0"
-                        FontStyle="Italic"/>
-                    <Button 
-                        x:Name="btn_U"
-                        Margin="1,1,0,0"
-                        Width="24">
-                        <Button.Content>
-                            <TextBlock>
-                                <Underline>U</Underline>
-                            </TextBlock>
-                        </Button.Content>
-                    </Button>
+                        <ToggleButton 
+                            x:Name="btn_B"
+                            Width="24"
+                            Margin="1,1,0,0"
+                            Content="B"
+                            FontWeight="Bold" 
+                            Unchecked="btn_B_Unchecked"
+                            Checked="btn_B_Checked"/>
+                        <ToggleButton 
+                            x:Name="btn_I"
+                            Width="24"
+                            Content="I"
+                            Margin="1,1,0,0"
+                            FontStyle="Italic"
+                            Unchecked="btn_I_Unchecked"
+                            Checked="btn_I_Checked"/>
+                        <ToggleButton 
+                            x:Name="btn_U"
+                            Margin="1,1,0,0"
+                            Width="24"
+                            Unchecked="btn_U_Unchecked"
+                            Checked="btn_U_Checked">
+                            <ToggleButton.Content>
+                                <TextBlock TextDecorations="Underline">
+                                    U
+                                </TextBlock>
+                            </ToggleButton.Content>
+                        </ToggleButton>
                 </StackPanel>
             </Border>
         </DockPanel>

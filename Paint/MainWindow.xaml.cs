@@ -175,12 +175,7 @@ namespace Paint
             if (_textbox != null)
                 _textbox.FontSize = Double.Parse(cbx_FontSize.SelectedValue.ToString());
         }
-        private void cbx_FontFamily_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (_textbox != null)
-                _textbox.FontFamily = new FontFamily(((ComboBoxItem)cbx_FontFamily.SelectedItem).Content.ToString());
-                
-        }
+        
         private void clp_Foreground_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
             CForeground = new SolidColorBrush((Color)clp_Foreground.SelectedColor);
@@ -200,6 +195,48 @@ namespace Paint
             }
         }
         #endregion
+        #region handler for text
+        private void cbx_FontFamily_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.FontFamily = new FontFamily(((ComboBoxItem)cbx_FontFamily.SelectedItem).Content.ToString());
+
+        }
+        private void btn_B_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.FontWeight = FontWeights.Bold;
+        }
+
+        private void btn_B_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.FontWeight = FontWeights.Normal;
+        }
+        private void btn_I_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.FontStyle = FontStyles.Italic;
+        }
+
+        private void btn_I_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.FontStyle = FontStyles.Normal;
+        }
+        private void btn_U_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.TextDecorations = TextDecorations.Underline;
+        }
+
+        private void btn_U_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (_textbox != null)
+                _textbox.TextDecorations = null;
+        }
+        #endregion
+        #region handler for drawing
         private void Strokes_StrokesChanged(object sender, StrokeCollectionChangedEventArgs e)
         {
             // if (e.Added.Count() != 0)
@@ -207,7 +244,7 @@ namespace Paint
         }
         private void icv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            switch(CurrentTool)
+            switch (CurrentTool)
             {
                 case Tool.Retangle:
                 case Tool.Triangle:
@@ -222,7 +259,7 @@ namespace Paint
             }
             if (_textbox != null)
             {
-                if(!isMouseOver)
+                if (!isMouseOver)
                 {
                     if (_textbox.Text.Length > 0)
                     {
@@ -236,6 +273,9 @@ namespace Paint
                             Foreground = CForeground,
                             FontSize = _textbox.FontSize,
                             FontFamily = _textbox.FontFamily,
+                            FontStyle = _textbox.FontStyle,
+                            FontWeight = _textbox.FontWeight,
+                            TextDecorations = _textbox.TextDecorations
                         };
                         icv_Paint.Children.Add(textblock);
                         InkCanvas.SetLeft(textblock, InkCanvas.GetLeft(_textbox));
@@ -244,7 +284,7 @@ namespace Paint
                     icv_Paint.Children.Remove(_textbox);
                     _textbox = null;
                 }
-                
+
 
             }
 
@@ -271,7 +311,7 @@ namespace Paint
                     switch (CurrentTool)
                     {
                         case Tool.Text:
-                            if(_textbox == null)
+                            if (_textbox == null)
                             {
                                 Rectangle DRshape = shape as Rectangle;
                                 DRshape.Width = (eX - sX);
@@ -345,7 +385,7 @@ namespace Paint
                 case Tool.Text:
                     if (icv_Paint.Children.Contains(shape))
                         icv_Paint.Children.Remove(shape);
-                    if(_textbox == null)
+                    if (_textbox == null)
                     {
                         _textbox = new TextBox()
                         {
@@ -355,8 +395,11 @@ namespace Paint
                             TextWrapping = TextWrapping.Wrap,
                             FontFamily = new FontFamily(cbx_FontFamily.Text),
                             FontSize = Double.Parse(cbx_FontSize.Text),
+                            FontStyle = (bool)btn_I.IsChecked ? FontStyles.Italic : FontStyles.Normal,
+                            FontWeight = (bool)btn_B.IsChecked ? FontWeights.Bold : FontWeights.Normal,
+                            TextDecorations = (bool)btn_U.IsChecked ? TextDecorations.Underline : null,                        
                         };
-
+                        
                         //resize text box
                         if (_textbox.Width <= 100) _textbox.Width = 100;
                         if (_textbox.Height <= 40) _textbox.Height = 40;
@@ -371,9 +414,11 @@ namespace Paint
                         _textbox.MouseLeave += _textbox_MouseLeave;
                     }
                     break;
-            }    
-                
+            }
+
         }
+        #endregion
+
 
 
         //function for Genarating shapes
@@ -477,7 +522,7 @@ namespace Paint
             isMouseOver = false;
         }
 
-
+        
         private void _textbox_MouseEnter(object sender, MouseEventArgs e)
         {
             isMouseOver = true;
