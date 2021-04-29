@@ -133,7 +133,8 @@
                     </Button>
                     <Button 
                         Width="32"
-                        x:Name="btn_Picture"
+                        x:Name="btn_Image"
+                        Click="btn_Image_Click"
                         ToolTip="Picture">
                         <Image Source="Resources/picture.png"/>
                     </Button>
@@ -143,6 +144,13 @@
                         Width="32"
                         ToolTip="Text">
                         <Image Source="Resources/text.png"/>
+                    </Button>
+                    <Button 
+                        x:Name="btn_Select"
+                        Click="btn_Select_Click"
+                        Width="32"
+                        ToolTip="Text">
+                        <Image Source="Resources/select.png"/>
                     </Button>
                 </StackPanel>
             </Border>

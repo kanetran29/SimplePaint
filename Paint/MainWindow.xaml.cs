@@ -9,6 +9,8 @@ using System.Windows.Media;
 using System.Windows.Ink;
 using System.Diagnostics;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.Windows.Media.Imaging;
 
 namespace Paint
 {
@@ -27,6 +29,8 @@ namespace Paint
             Ellipse,
             Pentagon,
             Text,
+            Image,
+            Select,
         }
 
         UIElement shape = null;
@@ -39,6 +43,7 @@ namespace Paint
         private Tool CurrentTool;
         Point startP, endP;
         bool isMouseOver = false;
+        ImageBrush img = null;
 
         public MainWindow()
         {
@@ -136,15 +141,36 @@ namespace Paint
             icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
             CurrentTool = Tool.Pentagon;
         }
-        private void btn_Selection_Click(object sender, RoutedEventArgs e)
+        private void btn_Select_Click(object sender, RoutedEventArgs e)
         {
             icv_Paint.EditingMode = InkCanvasEditingMode.Select;
-            //CurrentTool = Tool.Lasso;
+            CurrentTool = Tool.Select;
         }
         private void btn_Text_Click(object sender, RoutedEventArgs e)
         {
             icv_Paint.Cursor = Cursors.IBeam;
             CurrentTool = Tool.Text;
+        }
+        private void btn_Image_Click(object sender, RoutedEventArgs e)
+        {
+
+            icv_Paint.Cursor = Cursors.Pen;
+            CurrentTool = Tool.Image;
+            OpenFileDialog open = new OpenFileDialog()
+            {
+                Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
+            };
+            if (open.ShowDialog() == true)
+            {
+                Debug.WriteLine(open.FileName);
+                Uri fileUri = new Uri(open.FileName);
+                img = new ImageBrush()
+                {
+                    ImageSource = new BitmapImage(fileUri),
+                };
+            }
+            else
+                btn_Brush_Click(sender,e);
         }
         #endregion
         #region handler for properties
@@ -252,6 +278,7 @@ namespace Paint
                 case Tool.Pentagon:
                 case Tool.Line:
                 case Tool.Text:
+                case Tool.Image:
                     startP = e.GetPosition(icv_Paint);
                     icv_Paint.EditingMode = InkCanvasEditingMode.None;
                     shape = null;
@@ -310,6 +337,13 @@ namespace Paint
                 else
                     switch (CurrentTool)
                     {
+                        case Tool.Image:
+                            Rectangle Ishape = shape as Rectangle;
+                            Ishape.Width = (eX - sX);
+                            Ishape.Height = (eY - sY);
+                            Ishape.Margin = new Thickness(sX, sY, 0, 0);
+                            shape = Ishape;
+                            break;
                         case Tool.Text:
                             if (_textbox == null)
                             {
@@ -414,12 +448,50 @@ namespace Paint
                         _textbox.MouseLeave += _textbox_MouseLeave;
                     }
                     break;
+                case Tool.Image:
+                    //OpenFileDialog open = new OpenFileDialog()
+                    //{
+                    //    Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
+                    //};
+                    //if (open.ShowDialog() == true)
+                    //{
+                    //    Debug.WriteLine(open.FileName);
+                    //    Uri fileUri = new Uri(open.FileName);
+                    //    shape.
+                    //    Image img = new Image()
+                    //    {
+                    //        Width = Math.Abs(endP.X - startP.X),
+                    //        Height = Math.Abs(endP.Y - startP.Y),
+                    //        Source = new BitmapImage(fileUri),
+                    //        Stretch = Stretch.Fill,
+                    //        Margin = ((Rectangle)shape).Margin,
+                    //    };
+                    //    icv_Paint.Children.Add(img);
+                    //    icv_Paint.EditingMode = InkCanvasEditingMode.Select;
+                    //    //icv_Paint.Select(img as StrokeCollection);
+                    //};
+                    //if (icv_Paint.Children.Contains(shape))
+                    //    icv_Paint.Children.Remove(shape);
+                    shape = null;
+                    startP.X = startP.Y = 0;
+                    endP.X = endP.Y = 0;
+                    break;
             }
 
         }
         #endregion
 
 
+        //check mouse in
+        private void _textbox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            isMouseOver = false;
+        }
+
+        private void _textbox_MouseEnter(object sender, MouseEventArgs e)
+        {
+            isMouseOver = true;
+        }
 
         //function for Genarating shapes
         private UIElement GenerateShape()
@@ -503,29 +575,19 @@ namespace Paint
                     };
                     break;
                 case Tool.Text:
+                case Tool.Image:
                     shape = new Rectangle()
                     {
-                        Stroke = new SolidColorBrush(Colors.Black),
-                        Fill = new SolidColorBrush(Colors.Transparent),
+                        Stroke = Brushes.Transparent,
+                        Fill = img,
                         Width = (eX - sX),
                         Height = (eY - sY),
-                        StrokeThickness = 1,
-                        StrokeDashArray = new DoubleCollection(new double[] { 4, 3 }),
                         Margin = new Thickness(sX, sY, 0, 0)
                     };
                     break;
             }
             return shape;
         }
-        private void _textbox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            isMouseOver = false;
-        }
 
-        
-        private void _textbox_MouseEnter(object sender, MouseEventArgs e)
-        {
-            isMouseOver = true;
-        }
     }
 }
