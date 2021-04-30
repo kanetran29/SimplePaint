@@ -234,13 +234,10 @@ namespace Paint
                 case Tool.Eraser:
                     if (shape == null)
                     {
-                        //get color for fill and outline
-                        SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush(Colors.Transparent);
-                        SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? new SolidColorBrush((Color)clp_Background.SelectedColor) : new SolidColorBrush(Colors.Transparent);
                         shape = new Ellipse()
                         {
-                            Stroke = (CurrentTool == Tool.Brush) ? foreground : background,
-                            Fill = (CurrentTool == Tool.Brush) ? foreground : background,
+                            Stroke = (CurrentTool == Tool.Brush) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush((Color)clp_Background.SelectedColor),
+                            Fill = (CurrentTool == Tool.Brush) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush((Color)clp_Background.SelectedColor),
                             Width = BrushSize,
                             Height = BrushSize,
                             StrokeThickness = BrushSize,
@@ -250,7 +247,22 @@ namespace Paint
                         Undo.AddFirst(shape);
                     }
                     break;
-
+                case Tool.Select:
+                    if (shape == null)
+                    {
+                        shape = new Ellipse()
+                        {
+                            Stroke = new SolidColorBrush((Color)clp_Background.SelectedColor),
+                            Fill = new SolidColorBrush((Color)clp_Background.SelectedColor),
+                            Width = BrushSize,
+                            Height = BrushSize,
+                            StrokeThickness = BrushSize,
+                            Margin = new Thickness(startP.X, startP.Y, 0, 0)
+                        };
+                        cv_Paint.Children.Add(shape);
+                        Undo.AddFirst(shape);
+                    }
+                    break;
                 case Tool.Retangle:
                 case Tool.Triangle:
                 case Tool.Ellipse:
@@ -313,7 +325,7 @@ namespace Paint
                 else
                     switch (CurrentTool)
                     {
-                        
+                        case Tool.Select:
                         case Tool.Brush:
                         case Tool.Eraser:
                             if (shape is Ellipse)
@@ -330,6 +342,12 @@ namespace Paint
                                         endP,
                                     }
                                 };
+                                if (CurrentTool == Tool.Select)
+                                {
+                                    ((Polyline)shape).StrokeDashArray = new DoubleCollection(new double[] { 4, 3 });
+                                    ((Polyline)shape).StrokeThickness = 1;
+                                    ((Polyline)shape).Stroke = Brushes.Black;
+                                }
                                 cv_Paint.Children.Add(shape);
                                 Undo.AddFirst(shape);
                                 break;
@@ -407,6 +425,21 @@ namespace Paint
         {
             switch (CurrentTool)
             {
+                case Tool.Select:
+                    if (cv_Paint.Children.Contains(shape) && !(shape is Ellipse))
+                    {
+                        cv_Paint.Children.Remove(shape);
+                        Undo.Remove(shape);
+                        Polygon polygon = new Polygon()
+                        {
+                            Stroke = Brushes.Transparent,
+                            Points = (shape as Polyline).Points,
+                            Fill = new SolidColorBrush((Color)clp_Background.SelectedColor)
+                        };
+                        cv_Paint.Children.Add(polygon);
+                        Undo.AddFirst(polygon);
+                    }
+                    break;
                 case Tool.Text:
                     if (cv_Paint.Children.Contains(shape))
                     {

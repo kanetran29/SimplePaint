@@ -147,7 +147,7 @@
                         Click="btn_Select_Click"
                         Width="32"
                         ToolTip="Text">
-                        <Image Source="Resources/select.png"/>
+                        <Image Source="Resources/lasso.png"/>
                     </Button>
                 </StackPanel>
             </Border>
