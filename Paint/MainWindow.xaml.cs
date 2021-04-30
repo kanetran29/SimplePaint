@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Ink;
 using System.Diagnostics;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace Paint
 {
@@ -32,125 +30,115 @@ namespace Paint
             Image,
             Select,
         }
+        //define size
+        public const int Small = 2;
+        public const int Medium = 5;
+        public const int Large = 8;
+        int BrushSize = 2;
 
         UIElement shape = null;
         TextBox _textbox = null;
-        private MainViewModel MainVM;
 
-        private SolidColorBrush CForeground;
-        private SolidColorBrush CBackground;
+        Tool CurrentTool = Tool.Brush;
 
-        private Tool CurrentTool;
-        Point startP, endP;
+        Point startP = new Point(-1, -1);
+        Point endP = new Point(-1, -1);
         bool isMouseOver = false;
         ImageBrush img = null;
 
+        //Undo/Redo
+        public ICommand UndoCommand { get; set; }
+        public ICommand RedoCommand { get; set; }
+        public LinkedList<UIElement> Undo = new LinkedList<UIElement>();
+        public LinkedList<UIElement> Redo = new LinkedList<UIElement>();
         public MainWindow()
         {
             InitializeComponent();
-            icv_Paint.AddHandler(InkCanvas.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonDown), true);
-            icv_Paint.AddHandler(InkCanvas.PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(icv_Paint_MouseLeftButtonUp), true);
 
-            icv_Paint.UseCustomCursor = true;
-            cbx_Size.SelectedIndex = 0;
+            Set_FontFamilySource();
+            Set_FontSizeSource();
 
-            //set font family source
-            List<string> nonReadebleFonts = new List<string>();
-            foreach (FontFamily font in Fonts.SystemFontFamilies)
+
+            //Undo and Redo Command Implementation
+            btn_Undo.Command = new RelayCommand<object>((p) =>
             {
-                ComboBoxItem boxItem = new ComboBoxItem();
-                boxItem.Content = font.ToString();
-                Uri s = font.BaseUri;
-                if (!nonReadebleFonts.Contains(font.ToString()))
-                    boxItem.FontFamily = font;
-
-                cbx_FontFamily.Items.Add(boxItem);
-            }
-            cbx_FontFamily.SelectedIndex = 0;
-            //set font size source
-            cbx_FontSize.Items.Add(8.0);
-            cbx_FontSize.Items.Add(9.0);
-            cbx_FontSize.Items.Add(10.0);
-            cbx_FontSize.Items.Add(11.0);
-            cbx_FontSize.Items.Add(12.0);
-            cbx_FontSize.Items.Add(14.0);
-            cbx_FontSize.Items.Add(16.0);
-            cbx_FontSize.Items.Add(18.0);
-            cbx_FontSize.Items.Add(20.0);
-            cbx_FontSize.Items.Add(22.0);
-            cbx_FontSize.Items.Add(24.0);
-            cbx_FontSize.Items.Add(26.0);
-            cbx_FontSize.Items.Add(28.0);
-            cbx_FontSize.Items.Add(36.0);
-            cbx_FontSize.Items.Add(48.0);
-            cbx_FontSize.Items.Add(72.0);
-            cbx_FontSize.SelectedIndex = 0;
-            //get Data context
-            MainVM = PaintWindow.DataContext as MainViewModel;
-            CurrentTool = Tool.Brush;
-            CBackground = new SolidColorBrush(Colors.White);
-            CForeground = new SolidColorBrush(Colors.Black);
+                if (Undo.Count() == 0)
+                    return false;
+                return true;
+            }, (p) =>
+            {
+                Debug.WriteLine("[UNDO]" + Undo.Count());
+                UIElement _undo = Undo.First();
+                Undo.RemoveFirst();
+                cv_Paint.Children.Remove(_undo);
+                Redo.AddFirst(_undo);
+            });
+            btn_Redo.Command = new RelayCommand<object>((p) =>
+            {
+                if (Redo.Count == 0)
+                    return false;
+                return true;
+            }, (p) =>
+            {
+                Debug.WriteLine("[REDO]" + Redo.Count());
+                UIElement _redo = Redo.First();
+                Redo.RemoveFirst();
+                cv_Paint.Children.Add(_redo);
+                Undo.AddFirst(_redo);
+            });
         }
+
         #region Handler for tools
         private void btn_Eraser_Click(object sender, RoutedEventArgs e)
         {
-            // icv_Paint.Cursor = new Cursor(new System.IO.MemoryStream(Paint.Properties.Resources.Cursor1));
-            icv_Paint.Cursor = Cursors.No;
-            icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
+            // cv_Paint.Cursor = new Cursor(new System.IO.MemoryStream(Paint.Properties.Resources.Cursor1));
+            cv_Paint.Cursor = Cursors.No;
             CurrentTool = Tool.Eraser;
-            icv_Paint.EditingMode = InkCanvasEditingMode.None;
         }
         private void btn_Brush_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Brush;
-            icv_Paint.EditingMode = InkCanvasEditingMode.None;
         }
         private void btn_Line_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Line;
         }
         private void btn_Rectangle_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Retangle;
         }
         private void btn_Ellipse_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Ellipse;
         }
         private void btn_Triangle_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Triangle;
         }
         private void btn_Pentagon_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.Pen;
-            icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Pentagon;
         }
         private void btn_Select_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.EditingMode = InkCanvasEditingMode.Select;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Select;
         }
         private void btn_Text_Click(object sender, RoutedEventArgs e)
         {
-            icv_Paint.Cursor = Cursors.IBeam;
+            cv_Paint.Cursor = Cursors.IBeam;
             CurrentTool = Tool.Text;
         }
         private void btn_Image_Click(object sender, RoutedEventArgs e)
         {
 
-            icv_Paint.Cursor = Cursors.Pen;
+            cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Image;
             OpenFileDialog open = new OpenFileDialog()
             {
@@ -169,23 +157,19 @@ namespace Paint
                 btn_Brush_Click(sender,e);
         }
         #endregion
-        #region handler for properties
+        #region handler for size
         private void cbx_Size_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Debug.WriteLine(cbx_Size.SelectedIndex);
             switch(cbx_Size.SelectedIndex)
             {
-                case 0: 
-                    icv_Paint.DefaultDrawingAttributes.Width = 2;
-                    icv_Paint.DefaultDrawingAttributes.Height = 2;
+                case 0:
+                    BrushSize = Small;
                     break;
                 case 1:
-                    icv_Paint.DefaultDrawingAttributes.Width = 5;
-                    icv_Paint.DefaultDrawingAttributes.Height = 5;
+                    BrushSize = Medium;
                     break;
                 case 2:
-                    icv_Paint.DefaultDrawingAttributes.Width = 8;
-                    icv_Paint.DefaultDrawingAttributes.Height = 8;
+                    BrushSize = Large;
                     break;
                 default:
                     break;
@@ -196,25 +180,6 @@ namespace Paint
         {
             if (_textbox != null)
                 _textbox.FontSize = Double.Parse(cbx_FontSize.SelectedValue.ToString());
-        }
-        
-        private void clp_Foreground_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
-        {
-            CForeground = new SolidColorBrush((Color)clp_Foreground.SelectedColor);
-            if (icv_Paint != null)
-                //if (CurrentTool == Tool.Retangle || CurrentTool == Tool.Triangle || CurrentTool == Tool.Ellipse || CurrentTool == Tool.Pentagon || CurrentTool == Tool.Brush)
-                if (CurrentTool != Tool.Eraser)
-                    icv_Paint.DefaultDrawingAttributes.Color = CForeground.Color;
-        }
-        private void clp_Background_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
-        {
-            CBackground = new SolidColorBrush((Color)clp_Background.SelectedColor);
-            if (icv_Paint != null)
-            {
-                if (CurrentTool == Tool.Eraser)
-                    icv_Paint.DefaultDrawingAttributes.Color = CBackground.Color;
-                //icv_Paint.Background = CBackground;
-            }
         }
         #endregion
         #region handler for text
@@ -259,30 +224,30 @@ namespace Paint
         }
         #endregion
         #region handler for drawing
-        private void icv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void cv_Paint_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            startP = e.GetPosition(cv_Paint); // get shape start point
+            Redo.Clear(); // Can't redo anymore when added new Drawing element
             switch (CurrentTool)
             {
                 case Tool.Brush:
                 case Tool.Eraser:
-                    startP = e.GetPosition(icv_Paint);
-                    icv_Paint.EditingMode = InkCanvasEditingMode.None;
                     if (shape == null)
                     {
-                        double StrokeThickness = icv_Paint.DefaultDrawingAttributes.Width;
                         //get color for fill and outline
-                        SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? CForeground : new SolidColorBrush(Colors.Transparent);
-                        SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? CBackground : new SolidColorBrush(Colors.Transparent);
+                        SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush(Colors.Transparent);
+                        SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? new SolidColorBrush((Color)clp_Background.SelectedColor) : new SolidColorBrush(Colors.Transparent);
                         shape = new Ellipse()
                         {
                             Stroke = (CurrentTool == Tool.Brush) ? foreground : background,
                             Fill = (CurrentTool == Tool.Brush) ? foreground : background,
-                            Width = StrokeThickness,
-                            Height = StrokeThickness,
-                            StrokeThickness = StrokeThickness,
+                            Width = BrushSize,
+                            Height = BrushSize,
+                            StrokeThickness = BrushSize,
                             Margin = new Thickness(startP.X, startP.Y, 0, 0)
                         };
-                        icv_Paint.Children.Add(shape);                     
+                        cv_Paint.Children.Add(shape);
+                        Undo.AddFirst(shape);
                     }
                     break;
 
@@ -293,8 +258,6 @@ namespace Paint
                 case Tool.Line:
                 case Tool.Text:
                 case Tool.Image:           
-                    startP = e.GetPosition(icv_Paint);
-                    icv_Paint.EditingMode = InkCanvasEditingMode.None;
                     shape = null;
                     break;
             }
@@ -311,33 +274,30 @@ namespace Paint
                             TextWrapping = _textbox.TextWrapping,
                             Text = _textbox.Text,
                             Visibility = Visibility.Visible,
-                            Foreground = CForeground,
+                            Foreground = new SolidColorBrush((Color)clp_Foreground.SelectedColor),
                             FontSize = _textbox.FontSize,
                             FontFamily = _textbox.FontFamily,
                             FontStyle = _textbox.FontStyle,
                             FontWeight = _textbox.FontWeight,
                             TextDecorations = _textbox.TextDecorations
                         };
-                        icv_Paint.Children.Add(textblock);
-                        InkCanvas.SetLeft(textblock, InkCanvas.GetLeft(_textbox));
-                        InkCanvas.SetTop(textblock, InkCanvas.GetTop(_textbox));
+                        cv_Paint.Children.Add(textblock);
+                        Undo.AddFirst(textblock);
+                        Canvas.SetLeft(textblock, Canvas.GetLeft(_textbox));
+                        Canvas.SetTop(textblock, Canvas.GetTop(_textbox));
                     }
-                    icv_Paint.Children.Remove(_textbox);
+                    cv_Paint.Children.Remove(_textbox);
                     _textbox = null;
                 }
-
-
             }
 
         }
-        private void icv_Paint_MouseMove(object sender, MouseEventArgs e)
+        private void cv_Paint_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //get position and generate shape 
-                endP = e.GetPosition(icv_Paint);
-                if (startP.X == 0 && startP.Y == 0)
-                    return;
+                endP = e.GetPosition(cv_Paint);
                 double sX, sY, eX, eY;
                 sX = Math.Min(startP.X, endP.X);
                 sY = Math.Min(startP.Y, endP.Y);
@@ -346,7 +306,9 @@ namespace Paint
                 if (shape == null)
                 {
                     shape = GenerateShape();
-                    icv_Paint.Children.Add(shape);
+                    cv_Paint.Children.Add(shape);
+                    if (CurrentTool != Tool.Text)
+                        Undo.AddFirst(shape);
                 }
                 else
                     switch (CurrentTool)
@@ -356,18 +318,20 @@ namespace Paint
                         case Tool.Eraser:
                             if (shape is Ellipse)
                             {
-                                icv_Paint.Children.Remove(shape);
+                                cv_Paint.Children.Remove(shape);
+                                Undo.Remove(shape);
                                 shape = new Polyline()
                                 {
-                                    Stroke = (CurrentTool == Tool.Brush) ? CForeground : CBackground,
-                                    StrokeThickness = icv_Paint.DefaultDrawingAttributes.Width,
+                                    Stroke = (CurrentTool == Tool.Brush) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush((Color)clp_Background.SelectedColor),
+                                    StrokeThickness = BrushSize,
                                     Points = new PointCollection()
                                     {
                                         startP,
                                         endP,
                                     }
                                 };
-                                icv_Paint.Children.Add(shape);
+                                cv_Paint.Children.Add(shape);
+                                Undo.AddFirst(shape);
                                 break;
                             }
                             Polyline bpolyline = shape as Polyline;
@@ -439,37 +403,28 @@ namespace Paint
 
             }
         }
-        private void icv_Paint_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void cv_Paint_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-
             switch (CurrentTool)
             {
-                case Tool.Brush:
-                case Tool.Retangle:
-                case Tool.Triangle:
-                case Tool.Ellipse:
-                case Tool.Pentagon:
-                case Tool.Line:
-                    shape = null;
-                    startP.X = startP.Y = 0;
-                    endP.X = endP.Y = 0;
-                    break;
                 case Tool.Text:
-                    if (icv_Paint.Children.Contains(shape))
-                        icv_Paint.Children.Remove(shape);
+                    if (cv_Paint.Children.Contains(shape))
+                    {
+                        cv_Paint.Children.Remove(shape);
+                    }
                     if (_textbox == null)
                     {
                         _textbox = new TextBox()
                         {
-                            Width = Math.Abs(endP.X - startP.X),
-                            Height = Math.Abs(endP.Y - startP.Y),
+                            Width = endP.X < 0 ? 100 : Math.Abs(endP.X - startP.X),
+                            Height = endP.X < 0 ? 40 : Math.Abs(endP.Y - startP.Y),
                             Background = Brushes.Transparent,
                             TextWrapping = TextWrapping.Wrap,
                             FontFamily = new FontFamily(cbx_FontFamily.Text),
                             FontSize = Double.Parse(cbx_FontSize.Text),
                             FontStyle = (bool)btn_I.IsChecked ? FontStyles.Italic : FontStyles.Normal,
                             FontWeight = (bool)btn_B.IsChecked ? FontWeights.Bold : FontWeights.Normal,
-                            TextDecorations = (bool)btn_U.IsChecked ? TextDecorations.Underline : null,                        
+                            TextDecorations = (bool)btn_U.IsChecked ? TextDecorations.Underline : null,
                         };
                         
                         //resize text box
@@ -477,23 +432,20 @@ namespace Paint
                         if (_textbox.Height <= 40) _textbox.Height = 40;
 
 
-                        InkCanvas.SetLeft(_textbox, Math.Min(startP.X, endP.X));
-                        InkCanvas.SetTop(_textbox, Math.Min(startP.Y, endP.Y));
+                        Canvas.SetLeft(_textbox, endP.X < 0 ? startP.X : Math.Min(startP.X, endP.X));
+                        Canvas.SetTop(_textbox, endP.X < 0 ? startP.Y : Math.Min(startP.Y, endP.Y));
                         //_textbox.
-                        icv_Paint.Children.Add(_textbox);
+                        cv_Paint.Children.Add(_textbox);
                         _textbox.Focus();
                         _textbox.MouseEnter += _textbox_MouseEnter;
                         _textbox.MouseLeave += _textbox_MouseLeave;
                     }
                     break;
-                case Tool.Image:
-                    img = null;
-                    shape = null;
-                    startP.X = startP.Y = 0;
-                    endP.X = endP.Y = 0;
-                    break;
             }
-
+            img = null;
+            shape = null;
+            startP.X = startP.Y = -1;
+            endP.X = endP.Y = -1;
         }
         #endregion
         //check mouse in
@@ -506,14 +458,50 @@ namespace Paint
         {
             isMouseOver = true;
         }
+        //set properties
+        private void Set_FontFamilySource()
+        {
+            //set font family source
+            List<string> nonReadebleFonts = new List<string>();
+            foreach (FontFamily font in Fonts.SystemFontFamilies)
+            {
+                ComboBoxItem boxItem = new ComboBoxItem();
+                boxItem.Content = font.ToString();
+                Uri s = font.BaseUri;
+                if (!nonReadebleFonts.Contains(font.ToString()))
+                    boxItem.FontFamily = font;
 
+                cbx_FontFamily.Items.Add(boxItem);
+            }
+            cbx_FontFamily.SelectedIndex = 0;
+        }
+        private void Set_FontSizeSource()
+        {
+            //set font size source
+            cbx_FontSize.Items.Add(8.0);
+            cbx_FontSize.Items.Add(9.0);
+            cbx_FontSize.Items.Add(10.0);
+            cbx_FontSize.Items.Add(11.0);
+            cbx_FontSize.Items.Add(12.0);
+            cbx_FontSize.Items.Add(14.0);
+            cbx_FontSize.Items.Add(16.0);
+            cbx_FontSize.Items.Add(18.0);
+            cbx_FontSize.Items.Add(20.0);
+            cbx_FontSize.Items.Add(22.0);
+            cbx_FontSize.Items.Add(24.0);
+            cbx_FontSize.Items.Add(26.0);
+            cbx_FontSize.Items.Add(28.0);
+            cbx_FontSize.Items.Add(36.0);
+            cbx_FontSize.Items.Add(48.0);
+            cbx_FontSize.Items.Add(72.0);
+            cbx_FontSize.SelectedIndex = 0;
+        }
         //function for Genarating shapes
         private UIElement GenerateShape()
         {
-            double StrokeThickness = icv_Paint.DefaultDrawingAttributes.Width;
             //get color for fill and outline
-            SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? CForeground : new SolidColorBrush(Colors.Transparent);
-            SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? CBackground : new SolidColorBrush(Colors.Transparent);
+            SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush(Colors.Transparent);
+            SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? new SolidColorBrush((Color)clp_Background.SelectedColor) : new SolidColorBrush(Colors.Transparent);
 
             //get position
             double sX, sY, eX, eY;
@@ -528,12 +516,12 @@ namespace Paint
                 case Tool.Line:
                     shape = new Line()
                     {
-                        Stroke = CForeground, // line's color is always foreground
+                        Stroke = new SolidColorBrush((Color)clp_Foreground.SelectedColor), // line's color is always foreground
                         X1 = startP.X,
                         X2 = endP.X,
                         Y1 = startP.Y,
                         Y2 = endP.Y,
-                        StrokeThickness = StrokeThickness,
+                        StrokeThickness = BrushSize,
                     };
                     break;
                 case Tool.Retangle:
@@ -543,7 +531,7 @@ namespace Paint
                         Fill = background,
                         Width = (eX - sX),
                         Height = (eY - sY),
-                        StrokeThickness = StrokeThickness,
+                        StrokeThickness = BrushSize,
                         Margin = new Thickness(sX, sY, 0, 0)
                     };
                     break;
@@ -558,7 +546,7 @@ namespace Paint
                             new Point(sX, eY),
                             new Point(eX, eY),
                         },
-                        StrokeThickness = StrokeThickness,
+                        StrokeThickness = BrushSize,
                     };
                     break;
                 case Tool.Ellipse:
@@ -568,7 +556,7 @@ namespace Paint
                         Fill = background,
                         Width = (eX - sX),
                         Height = (eY - sY),
-                        StrokeThickness = StrokeThickness,
+                        StrokeThickness = BrushSize,
                         Margin = new Thickness(sX, sY, 0, 0)
                     };
                     break;
@@ -585,10 +573,21 @@ namespace Paint
                             new Point(sX + (eX - sX)/4, eY),
                             new Point(sX, sY + (eY - sY)/3),
                         },
-                        StrokeThickness = StrokeThickness,
+                        StrokeThickness = BrushSize,
                     };
                     break;
                 case Tool.Text:
+                    shape = new Rectangle()
+                    {
+                        Stroke = new SolidColorBrush(Colors.Black),
+                        Fill = new SolidColorBrush(Colors.Transparent),
+                        Width = (eX - sX),
+                        Height = (eY - sY),
+                        StrokeThickness = 1,
+                        StrokeDashArray = new DoubleCollection(new double[] { 4, 3 }),
+                        Margin = new Thickness(sX, sY, 0, 0)
+                    };
+                    break;
                 case Tool.Image:
                     shape = new Rectangle()
                     {

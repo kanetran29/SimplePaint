@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Name="PaintWindow"
-        DataContext="{StaticResource MainVM}"
         WindowState="Normal"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Simple Paint" Height="600" Width="800">
     <DockPanel        
         Background="LightGray"
@@ -39,17 +39,15 @@
                         </Style>
                     </StackPanel.Resources>
                     <Button 
-                    x:Name="btn_Undo"
-                    Width="32"
-                    Command="{Binding UndoCommand}"
-                    ToolTip="Undo">
+                        x:Name="btn_Undo"
+                        Width="32"
+                        ToolTip="Undo">
                         <Image Source="/Resources/undo.png" Width="24" Height="24"/>
                     </Button>
                     <Button 
-                    Width="32"
-                    x:Name="btn_Redo"
-                    Command="{Binding RedoCommand}"
-                    ToolTip="Redo">
+                        Width="32"
+                        x:Name="btn_Redo"
+                        ToolTip="Redo">
                         <Image Source="/Resources/redo.png" Width="24" Height="24"/>
                     </Button>
                     <Button 
@@ -180,13 +178,14 @@
                     BorderThickness="1" 
                     Margin="1,1,0,0">
                         <ComboBox 
-                        x:Name="cbx_Size"
-                        BorderThickness="0"
-                        Margin="1,1,0,0"
-                        Width="50"
-                        Padding="4,10,0,0"
-                        VerticalContentAlignment="Center"
-                        ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
+                            x:Name="cbx_Size"
+                            SelectedIndex="0"
+                            BorderThickness="0"
+                            Margin="1,1,0,0"
+                            Width="50"
+                            Padding="4,10,0,0"
+                            VerticalContentAlignment="Center"
+                            ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
                             <ComboBoxItem Width="48">
                                 <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
                             </ComboBoxItem>
@@ -228,7 +227,7 @@
                             Margin="1,1,0,0"
                             Width="50"
                             VerticalContentAlignment="Center"
-                            SelectedIndex="0"
+                            SelectedIndex="0"                           
                             ToolTip="Outline">
                             <ComboBoxItem Width="30" ToolTip="Solid Outline">
                                 <Image Height="20" Source="Resources/outline.png" Stretch="Fill" StretchDirection="Both"/>
@@ -245,23 +244,21 @@
                         Margin="1,1,0,0">
                         <Grid Width="40" Margin="1">
                             <xctk:ColorPicker
-                            x:Name="clp_Background"
-                            ToolTip="Background"
-                            Width="24" Height="24"
-                            SelectedColor="White"                    
-                            SelectedColorChanged="clp_Background_SelectedColorChanged" 
-                            Background="{x:Null}"
-                            BorderThickness="0"
-                            ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
+                                x:Name="clp_Background"
+                                ToolTip="Background"
+                                Width="24" Height="24" 
+                                SelectedColor="White"
+                                Background="{x:Null}"
+                                BorderThickness="0"
+                                ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
                             <xctk:ColorPicker
-                            x:Name="clp_Foreground"
-                            ToolTip="Foreground"
-                            Width="24" Height="24"
-                            SelectedColor="Black"
-                            SelectedColorChanged="clp_Foreground_SelectedColorChanged" 
-                            Background="{x:Null}"
-                            BorderThickness="0"
-                            ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
+                                x:Name="clp_Foreground"
+                                ToolTip="Foreground"
+                                Width="24" Height="24"
+                                SelectedColor="Black"
+                                Background="{x:Null}"
+                                BorderThickness="0"
+                                ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
                         </Grid>
                     </Border>
                     <Border 
@@ -272,7 +269,7 @@
                                 x:Name="cbx_FontFamily"
                                 BorderThickness="0"
                                 Margin="1,1,0,0"
-                                Width="100"
+                                Width="75"
                                 SelectionChanged="cbx_FontFamily_SelectionChanged"
                                 VerticalContentAlignment="Center"
                                 ToolTip="Font Family">
@@ -287,7 +284,7 @@
                                 x:Name="cbx_FontSize"
                                 BorderThickness="0"
                                 Margin="1,1,0,0"
-                                Width="50"
+                                Width="40"
                                 SelectionChanged="cbx_FontSize_SelectionChanged"
                                 VerticalContentAlignment="Center"
                                 ToolTip="Font Size">
@@ -324,11 +321,13 @@
                 </StackPanel>
             </Border>
         </DockPanel>
-        <InkCanvas
-            x:Name="icv_Paint"
-            PreviewMouseMove="icv_Paint_MouseMove"           
-            Strokes="{Binding InkStrokes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        <Canvas
+            x:Name="cv_Paint"
+            Background="White"
+            PreviewMouseMove="cv_Paint_MouseMove"  
+            PreviewMouseLeftButtonDown="cv_Paint_MouseLeftButtonDown"
+            PreviewMouseLeftButtonUp="cv_Paint_MouseLeftButtonUp"
             Margin="5">
-        </InkCanvas>
+        </Canvas>
     </DockPanel>
 </Window>
