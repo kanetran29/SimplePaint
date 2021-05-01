@@ -70,6 +70,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ActivableButton.cs" />
     <Compile Include="RelayCommand.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -113,16 +114,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\eraser.png" />
-    <Resource Include="Resources\paint.png" />
-    <Resource Include="Resources\picture.png" />
     <Resource Include="Resources\redo.png" />
-    <Resource Include="Resources\select.png" />
     <Resource Include="Resources\size.png" />
     <Resource Include="Resources\undo.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\circle.png" />
-    <Resource Include="Resources\diamond.png" />
     <Resource Include="Resources\rectangle.png" />
     <Resource Include="Resources\triangle.png" />
   </ItemGroup>
@@ -142,6 +139,15 @@
     <Resource Include="Resources\nofill.png" />
     <Resource Include="Resources\fill.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\pentagon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\brush.png" />
+    <Resource Include="Resources\image.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

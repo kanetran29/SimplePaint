@@ -9,325 +9,352 @@
         WindowStartupLocation="CenterScreen"
         Name="PaintWindow"
         WindowState="Normal"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        UseLayoutRounding="True"
+        Background="#01000000"
+        MinWidth="750"
+        AllowsTransparency="True"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Simple Paint" Height="600" Width="800">
-    <DockPanel        
-        Background="LightGray"
-        x:Name="dpn_Main"
-        LastChildFill="True">
-        <DockPanel DockPanel.Dock="Top">
-            <Border 
-                DockPanel.Dock="Left"
-                Grid.Column="0"
-                Height="40"             
-                Margin="5,5,5,0"
-                BorderThickness="0"          
-                HorizontalAlignment="Left">
-                <Border.Effect>
-                    <DropShadowEffect Color="LightGray"/>
-                </Border.Effect>
-                <StackPanel
-                    Name="spn_Tools" 
-                    Orientation="Horizontal"
-                    Background="LightGray"
-                    Height="34">
-                    <StackPanel.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <Setter Property="Margin" Value="1,1,0,0"/>
-                            <Setter Property="Background" Value="{x:Null}"/>
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button 
-                        x:Name="btn_Undo"
-                        Width="32"
-                        ToolTip="Undo">
-                        <Image Source="/Resources/undo.png" Width="24" Height="24"/>
-                    </Button>
-                    <Button 
-                        Width="32"
-                        x:Name="btn_Redo"
-                        ToolTip="Redo">
-                        <Image Source="/Resources/redo.png" Width="24" Height="24"/>
-                    </Button>
-                    <Button 
-                    x:Name="btn_Eraser"
-                    Width="32"
-                    ToolTip="Eraser" Click="btn_Eraser_Click">
-                        <Image Source="/Resources/eraser.png" Width="24" Height="24"/>
-                    </Button>
-                    <Border BorderBrush="DimGray" BorderThickness="1" Margin="1,1,0,0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Button
-                            BorderThickness="0"
-                            Grid.Column="0"
-                            Grid.Row="0"
-                            x:Name="btn_Rectangle"
-                            Width="16"
-                            Height="15"
-                            Padding="2" 
-                            ToolTip="Rectangle" 
-                            Click="btn_Rectangle_Click">
-                                <Image Source="Resources/rectangle.png"/>
-                            </Button>
-                            <Button 
-                            BorderThickness="0"
-                            Grid.Column="0"
-                            Grid.Row="1"
-                            x:Name="btn_Triangle"
-                            Width="16"
-                            Height="15"
-                            Padding="2" 
-                            ToolTip="Triangle"
-                            Click="btn_Triangle_Click">
-                                <Image Source="Resources/triangle.png"/>
-                            </Button>
-                            <Button 
-                                BorderThickness="0"
-                                Grid.Column="1"
-                                Grid.Row="0"
-                                x:Name="btn_Ellipse"
-                                Width="16"
-                                Height="15"
-                                Padding="2"
-                                ToolTip="Ellipse"
-                                Click="btn_Ellipse_Click">
-                                <Image Source="Resources/circle.png"/>
-                            </Button>
-                            <Button
-                                BorderThickness="0"
-                                Grid.Column="1"
-                                Grid.Row="1"
-                                x:Name="btn_Pentagon"
-                                Width="16"
-                                Height="15"
-                                Padding="2" 
-                                ToolTip="Pentagon"
-                                Click="btn_Pentagon_Click">
-                                <Image Source="Resources/diamond.png"/>
-                            </Button>
-                        </Grid>
+        Title="Simple Paint"
+        Height="800">
+    <DockPanel
+               LastChildFill="True"
+               Width="{Binding ElementName=PaintWindow, Path=Width}"
+               x:Name="dpn_Main">
+        <DockPanel.Resources>
+            <Style TargetType="local:ActivableButton"
+                   BasedOn="{StaticResource FunctionalButton}">
+                <Setter Property="Padding"
+                        Value="0" />
+                <Setter Property="Width"
+                        Value="32" />
+                <Setter Property="Height"
+                        Value="32" />
+            </Style>
+        </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Top"
+                    Name="spn_Control"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Right"
+                    Background="Transparent">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="BorderThickness"
+                            Value="1" />
+                    <Setter Property="Margin"
+                            Value="1,1,0,0" />
+                </Style>
+            </StackPanel.Resources>
+            <Grid HorizontalAlignment="Right"
+                  Margin="0">
+                <StackPanel x:Name="spn_bar"
+                            Margin="0,0,0,0"
+                            Orientation="{Binding ElementName=spn_Tools, Path=Orientation, UpdateSourceTrigger=PropertyChanged}"
+                            HorizontalAlignment="Right">
+                    <Border x:Name="PaletteGrip"
+                            Width="433"
+                            Cursor="SizeAll"
+                            Height="25"
+                            PreviewMouseDown="PaletteGrip_PreviewMouseDown"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Margin="0"
+                            Padding="3">
+                        <Border CornerRadius="5"
+                                Background="#338A8A8A"
+                                ToolTip="Drap and Drop">
+                            <TextBlock x:Name="InfoBox"
+                                       Foreground="Black"
+                                       FontSize="10"
+                                       FontFamily="Consolas"
+                                       Margin="0"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
                     </Border>
-                    <Button 
-                    x:Name="btn_Line"
-                    Width="32"
-                    ToolTip="Line" Click="btn_Line_Click">
-                        <Image Source="Resources/line.png"/>
-                    </Button>
-                    <Button 
-                    x:Name="btn_Brush"
-                    Width="32"
-                    ToolTip="Brush" Click="btn_Brush_Click">
-                        <Image Source="Resources/paint.png"/>
-                    </Button>
-                    <Button 
-                        Width="32"
-                        x:Name="btn_Image"
-                        Click="btn_Image_Click"
-                        ToolTip="Picture">
-                        <Image Source="Resources/picture.png"/>
-                    </Button>
-                    <Button 
-                        x:Name="btn_Text"
-                        Click="btn_Text_Click"
-                        Width="32"
-                        ToolTip="Text">
-                        <Image Source="Resources/text.png"/>
-                    </Button>
-                    <Button 
-                        x:Name="btn_Select"
-                        Click="btn_Select_Click"
-                        Width="32"
-                        ToolTip="Text">
-                        <Image Source="Resources/lasso.png"/>
+                    <Button x:Name="CloseButton"
+                            Style="{StaticResource SpinningButton}"
+                            Background="#FFFF7774"
+                            Click="CloseButton_Click"
+                            VerticalAlignment="Center">
+                        <Path Data="{DynamicResource IconCross}"
+                              Margin="1,1,0,0"
+                              Stretch="Fill"
+                              Fill="White"
+                              Height="10"
+                              Width="10">
+                        </Path>
                     </Button>
                 </StackPanel>
-            </Border>
-            <Border
-                Grid.Column="1"
-                Height="40"             
-                Margin="50,5,5,0"
-                BorderThickness="0"     
-                DockPanel.Dock="Left"
-                HorizontalAlignment="Left">
-                <Border.Effect>
-                    <DropShadowEffect Color="LightGray"/>
-                </Border.Effect>
-                <StackPanel
-                    Name="spn_Properties" 
-                    Orientation="Horizontal"
-                    Background="LightGray"
-                    Height="34">
-                    <StackPanel.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <Setter Property="Margin" Value="1,1,0,0"/>
-                            <Setter Property="Background" Value="{x:Null}"/>
-                        </Style>
-                    </StackPanel.Resources>
-                    <Border 
-                    BorderBrush="DimGray" 
-                    BorderThickness="1" 
-                    Margin="1,1,0,0">
-                        <ComboBox 
-                            x:Name="cbx_Size"
-                            SelectedIndex="0"
-                            BorderThickness="0"
-                            Margin="1,1,0,0"
-                            Width="50"
-                            Padding="4,10,0,0"
-                            VerticalContentAlignment="Center"
-                            ToolTip="Size" SelectionChanged="cbx_Size_SelectionChanged">
-                            <ComboBoxItem Width="48">
-                                <Image Height="2" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                            </ComboBoxItem>
-                            <ComboBoxItem Width="48">
-                                <Image Height="5" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                            </ComboBoxItem>
-                            <ComboBoxItem Width="48">
-                                <Image Height="8" Source="Resources/size.png" Stretch="Fill" StretchDirection="UpOnly"/>
-                            </ComboBoxItem>
-                        </ComboBox>
-                    </Border>
-                    <Border 
-                        BorderBrush="DimGray" 
-                        BorderThickness="1" 
-                        Margin="1,1,0,0">
-                        <ComboBox 
-                            x:Name="cbx_Fill"
-                            BorderThickness="0"
-                            Margin="1,1,0,0"
-                            Width="50"
-                            VerticalContentAlignment="Center"
-                            SelectedIndex="0"
-                            ToolTip="Fill Mode">
-                            <ComboBoxItem Width="30" ToolTip="No Fill">
-                                <Image Height="20" Source="Resources/nofill.png" Stretch="Fill" StretchDirection="Both"/>
-                            </ComboBoxItem>
-                            <ComboBoxItem Width="30" ToolTip="Solid Color">
-                                <Image Height="20" Source="Resources/fill.png" Stretch="Fill" StretchDirection="Both"/>
-                            </ComboBoxItem>
-                        </ComboBox>
-                    </Border>
-                    <Border 
-                        BorderBrush="DimGray" 
-                        BorderThickness="1" 
-                        Margin="1,1,0,0">
-                        <ComboBox 
-                            x:Name="cbx_Outline"
-                            BorderThickness="0"
-                            Margin="1,1,0,0"
-                            Width="50"
-                            VerticalContentAlignment="Center"
-                            SelectedIndex="0"                           
-                            ToolTip="Outline">
-                            <ComboBoxItem Width="30" ToolTip="Solid Outline">
-                                <Image Height="20" Source="Resources/outline.png" Stretch="Fill" StretchDirection="Both"/>
-                            </ComboBoxItem>
-                            <ComboBoxItem Width="30" ToolTip="No Outline">
-                                <Image Height="20" Source="Resources/fill.png" Stretch="Fill" StretchDirection="Both"/>
-                            </ComboBoxItem>
-                        </ComboBox>
-                    </Border>
-                    <Border 
-                        BorderBrush="DimGray" 
-                        ToolTip="Color"
-                        BorderThickness="1" 
-                        Margin="1,1,0,0">
-                        <Grid Width="40" Margin="1">
-                            <xctk:ColorPicker
-                                x:Name="clp_Background"
-                                ToolTip="Background"
-                                Width="24" Height="24" 
-                                SelectedColor="White"
-                                Background="{x:Null}"
-                                BorderThickness="0"
-                                ShowDropDownButton="False" Margin="16,7,0,-1.8"/>
-                            <xctk:ColorPicker
-                                x:Name="clp_Foreground"
-                                ToolTip="Foreground"
-                                Width="24" Height="24"
-                                SelectedColor="Black"
-                                Background="{x:Null}"
-                                BorderThickness="0"
-                                ShowDropDownButton="False" Margin="0,-2,16,7.2"/>
-                        </Grid>
-                    </Border>
-                    <Border 
-                        BorderBrush="DimGray" 
-                        BorderThickness="1" 
-                        Margin="1,1,0,0">
-                            <ComboBox 
-                                x:Name="cbx_FontFamily"
-                                BorderThickness="0"
-                                Margin="1,1,0,0"
-                                Width="75"
-                                SelectionChanged="cbx_FontFamily_SelectionChanged"
-                                VerticalContentAlignment="Center"
-                                ToolTip="Font Family">
-                            </ComboBox>
-                        </Border>
-                        <Border 
-                            BorderBrush="DimGray" 
-                            BorderThickness="1"
-                            
-                            Margin="1,1,0,0">
-                            <ComboBox 
-                                x:Name="cbx_FontSize"
-                                BorderThickness="0"
-                                Margin="1,1,0,0"
-                                Width="40"
-                                SelectionChanged="cbx_FontSize_SelectionChanged"
-                                VerticalContentAlignment="Center"
-                                ToolTip="Font Size">
-                            </ComboBox>
-                        </Border>
-                        <ToggleButton 
-                            x:Name="btn_B"
-                            Width="24"
-                            Margin="1,1,0,0"
-                            Content="B"
-                            FontWeight="Bold" 
-                            Unchecked="btn_B_Unchecked"
-                            Checked="btn_B_Checked"/>
-                        <ToggleButton 
-                            x:Name="btn_I"
-                            Width="24"
-                            Content="I"
-                            Margin="1,1,0,0"
-                            FontStyle="Italic"
-                            Unchecked="btn_I_Unchecked"
-                            Checked="btn_I_Checked"/>
-                        <ToggleButton 
-                            x:Name="btn_U"
-                            Margin="1,1,0,0"
-                            Width="24"
-                            Unchecked="btn_U_Unchecked"
-                            Checked="btn_U_Checked">
-                            <ToggleButton.Content>
-                                <TextBlock TextDecorations="Underline">
-                                    U
-                                </TextBlock>
-                            </ToggleButton.Content>
-                        </ToggleButton>
-                </StackPanel>
-            </Border>
-        </DockPanel>
+            </Grid>
+            <StackPanel x:Name="spn_Tools"
+                        Orientation="Horizontal">
+                <ComboBox x:Name="cbx_FontFamily"
+                          Visibility="Hidden"
+                          Foreground="White"
+                          Style="{StaticResource CustomComboBox}"
+                          BorderThickness="0"
+                          Width="75"
+                          Height="32"
+                          SelectionChanged="cbx_FontFamily_SelectionChanged"
+                          VerticalContentAlignment="Center"
+                          ToolTip="Font Family" />
+                <ComboBox x:Name="cbx_FontSize"
+                          Visibility="{Binding ElementName=cbx_FontFamily, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                          Foreground="White"
+                          Style="{StaticResource CustomComboBox}"
+                          BorderThickness="0"
+                          Width="40"
+                          Height="32"
+                          SelectionChanged="cbx_FontSize_SelectionChanged"
+                          VerticalContentAlignment="Center"
+                          ToolTip="Font Size" />
+                <ToggleButton Style="{StaticResource CustomToggelButton}"
+                              Foreground="White"
+                              Visibility="{Binding ElementName=cbx_FontFamily, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                              x:Name="btn_B"
+                              Width="32"
+                              Height="32"
+                              Margin="1,1,0,0"
+                              Content="B"
+                              FontWeight="Bold"
+                              Unchecked="btn_B_Unchecked"
+                              Checked="btn_B_Checked" />
+                <ToggleButton Visibility="{Binding ElementName=cbx_FontFamily, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource CustomToggelButton}"
+                              x:Name="btn_I"
+                              Foreground="White"
+                              Width="32"
+                              Height="32"
+                              Content="I"
+                              Margin="1,1,0,0"
+                              FontStyle="Italic"
+                              Unchecked="btn_I_Unchecked"
+                              Checked="btn_I_Checked" />
+                <ToggleButton Visibility="{Binding ElementName=cbx_FontFamily, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource CustomToggelButton}"
+                              x:Name="btn_U"
+                              Foreground="White"
+                              Margin="1,1,0,0"
+                              Height="32"
+                              Width="32"
+                              Unchecked="btn_U_Unchecked"
+                              Checked="btn_U_Checked">
+                    <TextBlock TextDecorations="Underline"
+                               Text="U" />
+                </ToggleButton>
+                <local:ActivableButton x:Name="btn_Fill"
+                                       Visibility="Hidden"
+                                       ToolTip="Image"
+                                       Click="btn_Fill_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image x:Name="img_Fill"
+                           Source="/Resources/nofill.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Outline"
+                                       Visibility="{Binding ElementName=btn_Fill, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                       ToolTip="Image"
+                                       Click="btn_Outline_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image x:Name="img_Outline"
+                           Source="/Resources/outline.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <Grid Width="40"
+                      Margin="0,0,2,0"
+                      ToolTip="Color"
+                      Background="{StaticResource FakeTransparent}">
+                    <xctk:ColorPicker x:Name="clp_Background"
+                                      ToolTip="Background"
+                                      SelectedColor="White"
+                                      Background="{x:Null}"
+                                      BorderThickness="0"
+                                      ShowDropDownButton="False"
+                                      Margin="16,7,0,-1.8" />
+                    <xctk:ColorPicker x:Name="clp_Foreground"
+                                      ToolTip="Foreground"
+                                      SelectedColor="Black"
+                                      Background="{x:Null}"
+                                      BorderThickness="0"
+                                      ShowDropDownButton="False"
+                                      Margin="0,-2,16,7.2" />
+                </Grid>
+                <local:ActivableButton x:Name="btn_Size"
+                                       ToolTip="Image"
+                                       Click="btn_Size_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image x:Name="img_Size"
+                           Source="/Resources/size.png"
+                           Stretch="UniformToFill"
+                           Width="2"
+                           Height="2" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Brush"
+                                       ToolTip="Brush"
+                                       Click="btn_Brush_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/brush.png"
+                           Width="20"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Rectangle"
+                                       ToolTip="Rectangle"
+                                       Click="btn_Rectangle_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/rectangle.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Triangle"
+                                       ToolTip="Triangle"
+                                       Click="btn_Triangle_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/triangle.png"
+                           Width="20"
+                           Height="20" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Ellipse"
+                                       ToolTip="Ellipse"
+                                       Click="btn_Ellipse_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/circle.png"
+                           Width="20"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Pentagon"
+                                       ToolTip="Pentagon"
+                                       Click="btn_Pentagon_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/pentagon.png"
+                           Width="20"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Line"
+                                       ToolTip="Line"
+                                       Click="btn_Line_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/line.png"
+                           Width="20"
+                           Height="20" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Image"
+                                       ToolTip="Image"
+                                       Click="btn_Image_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/image.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Text"
+                                       ToolTip="Text"
+                                       Click="btn_Text_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/text.png"
+                           Width="16"
+                           Height="14" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Select"
+                                       ToolTip="Select"
+                                       Click="btn_Select_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/lasso.png"
+                           Width="20"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Eraser"
+                                       ToolTip="Eraser"
+                                       Click="btn_Eraser_Click"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/eraser.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Undo"
+                                       ToolTip="Undo"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/undo.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+                <local:ActivableButton x:Name="btn_Redo"
+                                       ToolTip="Redo"
+                                       Focusable="False">
+                    <local:ActivableButton.RenderTransform>
+                        <RotateTransform CenterX="16"
+                                         CenterY="16" />
+                    </local:ActivableButton.RenderTransform>
+                    <Image Source="/Resources/redo.png"
+                           Width="16"
+                           Height="16" />
+                </local:ActivableButton>
+            </StackPanel>
+        </StackPanel>
         <Canvas
+            Margin="5"
             x:Name="cv_Paint"
             Background="White"
-            PreviewMouseMove="cv_Paint_MouseMove"  
-            PreviewMouseLeftButtonDown="cv_Paint_MouseLeftButtonDown"
-            PreviewMouseLeftButtonUp="cv_Paint_MouseLeftButtonUp"
-            Margin="5">
-        </Canvas>
+            PreviewMouseMove="cv_Paint_MouseMove"
+            MouseLeftButtonDown="cv_Paint_MouseLeftButtonDown"
+            MouseLeftButtonUp="cv_Paint_MouseLeftButtonUp"/>
     </DockPanel>
 </Window>

@@ -9,6 +9,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Windows.Media.Imaging;
 using System.Linq;
+using System.Windows.Media.Animation;
 
 namespace Paint
 {
@@ -17,6 +18,14 @@ namespace Paint
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly Duration Duration1 = (Duration)Application.Current.Resources["Duration1"];
+        private static readonly Duration Duration2 = (Duration)Application.Current.Resources["Duration2"];
+        private static readonly Duration Duration3 = (Duration)Application.Current.Resources["Duration3"];
+        private static readonly Duration Duration4 = (Duration)Application.Current.Resources["Duration4"];
+        private static readonly Duration Duration5 = (Duration)Application.Current.Resources["Duration5"];
+        private static readonly Duration Duration7 = (Duration)Application.Current.Resources["Duration7"];
+        private static readonly Duration Duration10 = (Duration)Application.Current.Resources["Duration10"];
+
         public enum Tool 
         {
             Brush,
@@ -35,6 +44,8 @@ namespace Paint
         public const int Medium = 5;
         public const int Large = 8;
         int BrushSize = 2;
+        bool Fill = false;
+        bool Outline = true;
 
         UIElement shape = null;
         TextBox _textbox = null;
@@ -54,11 +65,8 @@ namespace Paint
         public MainWindow()
         {
             InitializeComponent();
-
             Set_FontFamilySource();
             Set_FontSizeSource();
-
-
             //Undo and Redo Command Implementation
             btn_Undo.Command = new RelayCommand<object>((p) =>
             {
@@ -86,6 +94,8 @@ namespace Paint
                 cv_Paint.Children.Add(_redo);
                 Undo.AddFirst(_redo);
             });
+            ResetControl();
+
         }
 
         #region Handler for tools
@@ -94,52 +104,79 @@ namespace Paint
             // cv_Paint.Cursor = new Cursor(new System.IO.MemoryStream(Paint.Properties.Resources.Cursor1));
             cv_Paint.Cursor = Cursors.No;
             CurrentTool = Tool.Eraser;
+            ResetControl();
+            btn_Eraser.IsActived = true;
         }
         private void btn_Brush_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Brush;
+            ResetControl();
+            btn_Brush.IsActived = true;
         }
         private void btn_Line_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Line;
+            ResetControl();
+            btn_Line.IsActived = true;
         }
         private void btn_Rectangle_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Retangle;
+            ResetControl();
+            btn_Rectangle.IsActived = true;
+            btn_Fill.Visibility = Visibility.Visible;
         }
         private void btn_Ellipse_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Ellipse;
+            ResetControl();
+            btn_Ellipse.IsActived = true;
+            btn_Fill.Visibility = Visibility.Visible;
+   
         }
         private void btn_Triangle_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Triangle;
+            ResetControl();
+            btn_Triangle.IsActived = true;
+            btn_Fill.Visibility = Visibility.Visible;
         }
         private void btn_Pentagon_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Pentagon;
+            ResetControl();
+            btn_Pentagon.IsActived = true;
+            btn_Fill.Visibility = Visibility.Visible;
         }
         private void btn_Select_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Select;
+            ResetControl();
+            btn_Select.IsActived = true;
         }
         private void btn_Text_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.IBeam;
             CurrentTool = Tool.Text;
+            ResetControl();
+            btn_Text.IsActived = true;
+            cbx_FontFamily.Visibility = Visibility.Visible;
+
         }
         private void btn_Image_Click(object sender, RoutedEventArgs e)
         {
 
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Image;
+            ResetControl();
+            btn_Image.IsActived = true;
             OpenFileDialog open = new OpenFileDialog()
             {
                 Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
@@ -158,23 +195,36 @@ namespace Paint
         }
         #endregion
         #region handler for size
-        private void cbx_Size_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void btn_Outline_Click(object sender, RoutedEventArgs e)
         {
-            switch(cbx_Size.SelectedIndex)
+            Outline = !Outline;
+            Debug.WriteLine(img_Fill.Source + "");
+            string source = @"pack://application:,,,/" + (Outline ? "Resources/outline.png" : @"Resources/fill.png");
+            img_Outline.Source = new BitmapImage(new Uri(source));
+        }
+
+        private void btn_Fill_Click(object sender, RoutedEventArgs e)
+        {
+            Fill = !Fill;
+            string source = @"pack://application:,,,/" + (Outline ? "Resources/fill.png" : @"Resources/nofill.png");
+            img_Fill.Source = new BitmapImage(new Uri(source));
+        }
+
+        private void btn_Size_Click(object sender, RoutedEventArgs e)
+        {
+            switch (BrushSize)
             {
-                case 0:
-                    BrushSize = Small;
-                    break;
-                case 1:
+                case Small:
                     BrushSize = Medium;
                     break;
-                case 2:
+                case Medium:
                     BrushSize = Large;
                     break;
-                default:
+                case Large:
+                    BrushSize = Small;
                     break;
             }
-                
+            img_Size.Width = img_Size.Height = BrushSize;
         }
         private void cbx_FontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -529,12 +579,20 @@ namespace Paint
             cbx_FontSize.Items.Add(72.0);
             cbx_FontSize.SelectedIndex = 0;
         }
+
+        private void ResetControl()
+        {
+            btn_Undo.IsActived = btn_Redo.IsActived = btn_Eraser.IsActived
+                = btn_Rectangle.IsActived = btn_Ellipse.IsActived = btn_Triangle.IsActived = btn_Pentagon.IsActived
+                = btn_Line.IsActived = btn_Brush.IsActived = btn_Text.IsActived = btn_Image.IsActived = btn_Select.IsActived = false;
+            btn_Fill.Visibility = cbx_FontFamily.Visibility = Visibility.Hidden;
+        }
         //function for Genarating shapes
         private UIElement GenerateShape()
         {
             //get color for fill and outline
-            SolidColorBrush foreground = (cbx_Outline.SelectedIndex == 0) ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush(Colors.Transparent);
-            SolidColorBrush background = (cbx_Fill.SelectedIndex == 1) ? new SolidColorBrush((Color)clp_Background.SelectedColor) : new SolidColorBrush(Colors.Transparent);
+            SolidColorBrush foreground = Outline ? new SolidColorBrush((Color)clp_Foreground.SelectedColor) : new SolidColorBrush(Colors.Transparent);
+            SolidColorBrush background = Fill ? new SolidColorBrush((Color)clp_Background.SelectedColor) : new SolidColorBrush(Colors.Transparent);
 
             //get position
             double sX, sY, eX, eY;
@@ -635,5 +693,20 @@ namespace Paint
             return shape;
         }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            var anim = new DoubleAnimation(0, Duration3);
+            anim.Completed += Exit;
+            BeginAnimation(OpacityProperty, anim);
+        }
+        private void Exit(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown(0);
+        }
+
+        private void PaletteGrip_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
     }
 }
