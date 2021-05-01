@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using System.Windows.Media.Imaging;
 using System.Linq;
 using System.Windows.Media.Animation;
+using System.Threading.Tasks;
 
 namespace Paint
 {
@@ -18,14 +19,6 @@ namespace Paint
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly Duration Duration1 = (Duration)Application.Current.Resources["Duration1"];
-        private static readonly Duration Duration2 = (Duration)Application.Current.Resources["Duration2"];
-        private static readonly Duration Duration3 = (Duration)Application.Current.Resources["Duration3"];
-        private static readonly Duration Duration4 = (Duration)Application.Current.Resources["Duration4"];
-        private static readonly Duration Duration5 = (Duration)Application.Current.Resources["Duration5"];
-        private static readonly Duration Duration7 = (Duration)Application.Current.Resources["Duration7"];
-        private static readonly Duration Duration10 = (Duration)Application.Current.Resources["Duration10"];
-
         public enum Tool 
         {
             Brush,
@@ -136,6 +129,7 @@ namespace Paint
             ResetControl();
             btn_Ellipse.IsActived = true;
             btn_Fill.Visibility = Visibility.Visible;
+
    
         }
         private void btn_Triangle_Click(object sender, RoutedEventArgs e)
@@ -692,10 +686,12 @@ namespace Paint
             }
             return shape;
         }
-
+        #region Helper
+        private string _staticInfo = "";
+        private bool _displayingInfo;
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            var anim = new DoubleAnimation(0, Duration3);
+            var anim = new DoubleAnimation(0, (Duration)Application.Current.Resources["Duration3"]);
             anim.Completed += Exit;
             BeginAnimation(OpacityProperty, anim);
         }
@@ -708,5 +704,28 @@ namespace Paint
         {
             this.DragMove();
         }
+
+        private async void Display(string info)
+        {
+            InfoBox.Text = info;
+            _displayingInfo = true;
+            await InfoDisplayTimeUp(new Progress<string>(box => InfoBox.Text = box));
+        }
+        private Task InfoDisplayTimeUp(IProgress<string> box)
+        {
+            return Task.Run(() =>
+            {
+                Task.Delay(2000).Wait();
+                box.Report(_staticInfo);
+                _displayingInfo = false;
+            });
+        }
+        private void SetStaticInfo(string info)
+        {
+            _staticInfo = info;
+            if (!_displayingInfo)
+                InfoBox.Text = _staticInfo;
+        }
+        #endregion
     }
 }
