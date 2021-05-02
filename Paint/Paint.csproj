@@ -149,5 +149,17 @@
     <Resource Include="Resources\brush.png" />
     <Resource Include="Resources\image.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\paint.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\simplepaint.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\paint.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="SplashScreenPaint.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

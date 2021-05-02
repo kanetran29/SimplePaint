@@ -10,7 +10,7 @@ using Microsoft.Win32;
 using System.Windows.Media.Imaging;
 using System.Linq;
 using System.Windows.Media.Animation;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace Paint
 {
@@ -19,7 +19,7 @@ namespace Paint
     /// </summary>
     public partial class MainWindow : Window
     {
-        public enum Tool 
+        public enum Tool
         {
             Brush,
             Line,
@@ -30,7 +30,7 @@ namespace Paint
             Pentagon,
             Text,
             Image,
-            Select,
+            Lasso,
         }
         //define size
         public const int Small = 2;
@@ -88,7 +88,6 @@ namespace Paint
                 Undo.AddFirst(_redo);
             });
             ResetControl();
-
         }
 
         #region Handler for tools
@@ -99,6 +98,7 @@ namespace Paint
             CurrentTool = Tool.Eraser;
             ResetControl();
             btn_Eraser.IsActived = true;
+            Display("Switched Tool to Eraser");
         }
         private void btn_Brush_Click(object sender, RoutedEventArgs e)
         {
@@ -106,6 +106,7 @@ namespace Paint
             CurrentTool = Tool.Brush;
             ResetControl();
             btn_Brush.IsActived = true;
+            Display("Switched Tool to Brush");
         }
         private void btn_Line_Click(object sender, RoutedEventArgs e)
         {
@@ -113,6 +114,7 @@ namespace Paint
             CurrentTool = Tool.Line;
             ResetControl();
             btn_Line.IsActived = true;
+            Display("Switched Tool to Line");
         }
         private void btn_Rectangle_Click(object sender, RoutedEventArgs e)
         {
@@ -121,6 +123,7 @@ namespace Paint
             ResetControl();
             btn_Rectangle.IsActived = true;
             btn_Fill.Visibility = Visibility.Visible;
+            Display("Switched Tool to Retangle");
         }
         private void btn_Ellipse_Click(object sender, RoutedEventArgs e)
         {
@@ -129,8 +132,7 @@ namespace Paint
             ResetControl();
             btn_Ellipse.IsActived = true;
             btn_Fill.Visibility = Visibility.Visible;
-
-   
+            Display("Switched Tool to Ellipse");
         }
         private void btn_Triangle_Click(object sender, RoutedEventArgs e)
         {
@@ -139,6 +141,7 @@ namespace Paint
             ResetControl();
             btn_Triangle.IsActived = true;
             btn_Fill.Visibility = Visibility.Visible;
+            Display("Switched Tool to Triangle");
         }
         private void btn_Pentagon_Click(object sender, RoutedEventArgs e)
         {
@@ -147,13 +150,15 @@ namespace Paint
             ResetControl();
             btn_Pentagon.IsActived = true;
             btn_Fill.Visibility = Visibility.Visible;
+            Display("Switched Tool to Pentagon");
         }
-        private void btn_Select_Click(object sender, RoutedEventArgs e)
+        private void btn_Lasso_Click(object sender, RoutedEventArgs e)
         {
             cv_Paint.Cursor = Cursors.Pen;
-            CurrentTool = Tool.Select;
+            CurrentTool = Tool.Lasso;
             ResetControl();
-            btn_Select.IsActived = true;
+            btn_Lasso.IsActived = true;
+            Display("Switched Tool to Lasso");
         }
         private void btn_Text_Click(object sender, RoutedEventArgs e)
         {
@@ -162,7 +167,7 @@ namespace Paint
             ResetControl();
             btn_Text.IsActived = true;
             cbx_FontFamily.Visibility = Visibility.Visible;
-
+            Display("Switched Tool to Text");
         }
         private void btn_Image_Click(object sender, RoutedEventArgs e)
         {
@@ -183,9 +188,10 @@ namespace Paint
                 {
                     ImageSource = new BitmapImage(fileUri),
                 };
+                Display("Switched Tool to Image");
             }
             else
-                btn_Brush_Click(sender,e);
+                btn_Brush_Click(sender, e);
         }
         #endregion
         #region handler for size
@@ -195,6 +201,7 @@ namespace Paint
             Debug.WriteLine(img_Fill.Source + "");
             string source = @"pack://application:,,,/" + (Outline ? "Resources/outline.png" : @"Resources/fill.png");
             img_Outline.Source = new BitmapImage(new Uri(source));
+            Display("Outline mode is " + (Outline ? "Solid Outline" : "No Outline"));
         }
 
         private void btn_Fill_Click(object sender, RoutedEventArgs e)
@@ -202,6 +209,7 @@ namespace Paint
             Fill = !Fill;
             string source = @"pack://application:,,,/" + (Outline ? "Resources/fill.png" : @"Resources/nofill.png");
             img_Fill.Source = new BitmapImage(new Uri(source));
+            Display("Fill mode is " + (Fill ? "Solid Fill" : "No Fill"));
         }
 
         private void btn_Size_Click(object sender, RoutedEventArgs e)
@@ -219,52 +227,80 @@ namespace Paint
                     break;
             }
             img_Size.Width = img_Size.Height = BrushSize;
+            Display("Brushsize is " + BrushSize + "px");
         }
         private void cbx_FontSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontSize = Double.Parse(cbx_FontSize.SelectedValue.ToString());
+                Display("Fontsize is " + _textbox.FontSize);
+            }
+                
+            
         }
         #endregion
         #region handler for text
         private void cbx_FontFamily_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontFamily = new FontFamily(((ComboBoxItem)cbx_FontFamily.SelectedItem).Content.ToString());
+                Display("FontFamily is " + ((ComboBoxItem)cbx_FontFamily.SelectedItem).Content.ToString());
+            }
 
         }
         private void btn_B_Checked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontWeight = FontWeights.Bold;
+                Display("Fontweight is Bold");
+            }
+
         }
 
         private void btn_B_Unchecked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontWeight = FontWeights.Normal;
+                Display("Fontweight is Normal");
+            }
         }
         private void btn_I_Checked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontStyle = FontStyles.Italic;
+                Display("FontStyle is Italic");
+            }
         }
 
         private void btn_I_Unchecked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.FontStyle = FontStyles.Normal;
+                Display("FontStyle is Normal");
+            }
         }
         private void btn_U_Checked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.TextDecorations = TextDecorations.Underline;
+                Display("TextDecoration is Underline");
+            }
         }
 
         private void btn_U_Unchecked(object sender, RoutedEventArgs e)
         {
             if (_textbox != null)
+            {
                 _textbox.TextDecorations = null;
+                Display("TextDecorations is Normal");
+            }
         }
         #endregion
         #region handler for drawing
@@ -291,7 +327,7 @@ namespace Paint
                         Undo.AddFirst(shape);
                     }
                     break;
-                case Tool.Select:
+                case Tool.Lasso:
                     if (shape == null)
                     {
                         shape = new Ellipse()
@@ -369,7 +405,7 @@ namespace Paint
                 else
                     switch (CurrentTool)
                     {
-                        case Tool.Select:
+                        case Tool.Lasso:
                         case Tool.Brush:
                         case Tool.Eraser:
                             if (shape is Ellipse)
@@ -386,7 +422,7 @@ namespace Paint
                                         endP,
                                     }
                                 };
-                                if (CurrentTool == Tool.Select)
+                                if (CurrentTool == Tool.Lasso)
                                 {
                                     ((Polyline)shape).StrokeDashArray = new DoubleCollection(new double[] { 4, 3 });
                                     ((Polyline)shape).StrokeThickness = 1;
@@ -469,7 +505,7 @@ namespace Paint
         {
             switch (CurrentTool)
             {
-                case Tool.Select:
+                case Tool.Lasso:
                     if (cv_Paint.Children.Contains(shape) && !(shape is Ellipse))
                     {
                         cv_Paint.Children.Remove(shape);
@@ -578,7 +614,7 @@ namespace Paint
         {
             btn_Undo.IsActived = btn_Redo.IsActived = btn_Eraser.IsActived
                 = btn_Rectangle.IsActived = btn_Ellipse.IsActived = btn_Triangle.IsActived = btn_Pentagon.IsActived
-                = btn_Line.IsActived = btn_Brush.IsActived = btn_Text.IsActived = btn_Image.IsActived = btn_Select.IsActived = false;
+                = btn_Line.IsActived = btn_Brush.IsActived = btn_Text.IsActived = btn_Image.IsActived = btn_Lasso.IsActived = false;
             btn_Fill.Visibility = cbx_FontFamily.Visibility = Visibility.Hidden;
         }
         //function for Genarating shapes
@@ -687,8 +723,7 @@ namespace Paint
             return shape;
         }
         #region Helper
-        private string _staticInfo = "";
-        private bool _displayingInfo;
+        private Timer timer;
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             var anim = new DoubleAnimation(0, (Duration)Application.Current.Resources["Duration3"]);
@@ -705,27 +740,25 @@ namespace Paint
             this.DragMove();
         }
 
-        private async void Display(string info)
+        private void Display(string info)
         {
             InfoBox.Text = info;
-            _displayingInfo = true;
-            await InfoDisplayTimeUp(new Progress<string>(box => InfoBox.Text = box));
+            if(timer != null)
+                timer.Stop();
+            timer = new Timer(2000);
+            timer.Elapsed += OnTimedEvent;
+            timer.Enabled = true;
+            timer.Start();
         }
-        private Task InfoDisplayTimeUp(IProgress<string> box)
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            return Task.Run(() =>
+            timer.Stop();
+            timer.Enabled = false;
+            this.Dispatcher.Invoke(() =>
             {
-                Task.Delay(2000).Wait();
-                box.Report(_staticInfo);
-                _displayingInfo = false;
+                InfoBox.Text = "";
             });
         }
-        private void SetStaticInfo(string info)
-        {
-            _staticInfo = info;
-            if (!_displayingInfo)
-                InfoBox.Text = _staticInfo;
-        }
-        #endregion
     }
+    #endregion
 }

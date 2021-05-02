@@ -17,9 +17,10 @@
         AllowsTransparency="True"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Simple Paint"
-        Height="800">
-    <DockPanel
-               LastChildFill="True"
+        Icon="/Resources/paint.ico"
+        Width="750"
+        Height="600">
+    <DockPanel LastChildFill="True"
                Width="{Binding ElementName=PaintWindow, Path=Width}"
                x:Name="dpn_Main">
         <DockPanel.Resources>
@@ -33,8 +34,8 @@
                         Value="32" />
             </Style>
         </DockPanel.Resources>
-        <StackPanel DockPanel.Dock="Top"
-                    Name="spn_Control"
+        <StackPanel Name="spn_Control"
+                    DockPanel.Dock="Top"
                     Orientation="Vertical"
                     Margin="5,0"
                     HorizontalAlignment="Right"
@@ -65,13 +66,17 @@
                         <Border CornerRadius="5"
                                 Background="#338A8A8A"
                                 ToolTip="Drap and Drop">
-                            <TextBlock x:Name="InfoBox"
-                                       Foreground="Black"
-                                       FontSize="10"
-                                       FontFamily="Consolas"
-                                       Margin="0"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" />
+                            <DockPanel>
+                                <TextBlock x:Name="InfoBox"
+                                           DockPanel.Dock="Top"
+                                           Foreground="White"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           FontFamily="Consolas"
+                                           Margin="0"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </DockPanel>
                         </Border>
                     </Border>
                     <Button x:Name="CloseButton"
@@ -302,9 +307,9 @@
                            Width="16"
                            Height="14" />
                 </local:ActivableButton>
-                <local:ActivableButton x:Name="btn_Select"
-                                       ToolTip="Select"
-                                       Click="btn_Select_Click"
+                <local:ActivableButton x:Name="btn_Lasso"
+                                       ToolTip="Lasso"
+                                       Click="btn_Lasso_Click"
                                        Focusable="False">
                     <local:ActivableButton.RenderTransform>
                         <RotateTransform CenterX="16"
@@ -350,12 +355,12 @@
                 </local:ActivableButton>
             </StackPanel>
         </StackPanel>
-        <Canvas
-            Margin="5"
-            x:Name="cv_Paint"
-            Background="White"
-            PreviewMouseMove="cv_Paint_MouseMove"
-            MouseLeftButtonDown="cv_Paint_MouseLeftButtonDown"
-            MouseLeftButtonUp="cv_Paint_MouseLeftButtonUp"/>
+        <Canvas Margin="5"
+                x:Name="cv_Paint"
+                Background="White"
+                PreviewMouseMove="cv_Paint_MouseMove"
+                MouseLeftButtonDown="cv_Paint_MouseLeftButtonDown"
+                MouseLeftButtonUp="cv_Paint_MouseLeftButtonUp">
+        </Canvas>
     </DockPanel>
 </Window>
