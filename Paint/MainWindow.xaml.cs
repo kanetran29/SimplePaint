@@ -171,7 +171,7 @@ namespace Paint
         }
         private void btn_Image_Click(object sender, RoutedEventArgs e)
         {
-
+            img = null;
             cv_Paint.Cursor = Cursors.Pen;
             CurrentTool = Tool.Image;
             ResetControl();
@@ -201,15 +201,19 @@ namespace Paint
             Debug.WriteLine(img_Fill.Source + "");
             string source = @"pack://application:,,,/" + (Outline ? "Resources/outline.png" : @"Resources/fill.png");
             img_Outline.Source = new BitmapImage(new Uri(source));
-            Display("Outline mode is " + (Outline ? "Solid Outline" : "No Outline"));
+            string str = (Outline ? "Solid Outline" : "No Outline");
+            btn_Outline.ToolTip = str;
+            Display("Outline mode is " + str);
         }
 
         private void btn_Fill_Click(object sender, RoutedEventArgs e)
         {
             Fill = !Fill;
-            string source = @"pack://application:,,,/" + (Outline ? "Resources/fill.png" : @"Resources/nofill.png");
+            string source = @"pack://application:,,,/" + (Fill ? "Resources/fill.png" : @"Resources/nofill.png");
             img_Fill.Source = new BitmapImage(new Uri(source));
-            Display("Fill mode is " + (Fill ? "Solid Fill" : "No Fill"));
+            string str = (Fill ? "Solid Fill" : "No Fill");
+            btn_Fill.ToolTip = str;
+            Display("Fill mode is " + str);
         }
 
         private void btn_Size_Click(object sender, RoutedEventArgs e)
@@ -389,6 +393,8 @@ namespace Paint
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //get position and generate shape 
+                if (startP.X == -1)
+                    return;
                 endP = e.GetPosition(cv_Paint);
                 double sX, sY, eX, eY;
                 sX = Math.Min(startP.X, endP.X);
@@ -556,7 +562,6 @@ namespace Paint
                     }
                     break;
             }
-            img = null;
             shape = null;
             startP.X = startP.Y = -1;
             endP.X = endP.Y = -1;
