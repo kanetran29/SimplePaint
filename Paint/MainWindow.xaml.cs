@@ -532,6 +532,7 @@ namespace Paint
                             Width = endP.X < 0 ? 100 : Math.Abs(endP.X - startP.X),
                             Height = endP.X < 0 ? 40 : Math.Abs(endP.Y - startP.Y),
                             Background = Brushes.Transparent,
+                            Foreground = new SolidColorBrush((Color)clp_Foreground.SelectedColor),
                             TextWrapping = TextWrapping.Wrap,
                             FontFamily = new FontFamily(cbx_FontFamily.Text),
                             FontSize = Double.Parse(cbx_FontSize.Text),

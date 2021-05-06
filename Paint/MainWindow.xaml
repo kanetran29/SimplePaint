@@ -152,7 +152,7 @@
                 </ToggleButton>
                 <local:ActivableButton x:Name="btn_Fill"
                                        Visibility="Hidden"
-                                       ToolTip="Image"
+                                       ToolTip="Fill"
                                        Click="btn_Fill_Click"
                                        Focusable="False">
                     <local:ActivableButton.RenderTransform>
@@ -166,7 +166,7 @@
                 </local:ActivableButton>
                 <local:ActivableButton x:Name="btn_Outline"
                                        Visibility="{Binding ElementName=btn_Fill, Path=Visibility,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       ToolTip="Image"
+                                       ToolTip="Outline"
                                        Click="btn_Outline_Click"
                                        Focusable="False">
                     <local:ActivableButton.RenderTransform>
